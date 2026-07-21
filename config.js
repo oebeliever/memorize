@@ -36,7 +36,53 @@ const CONFIG = {
   },
 
   // ========== 新板块占位 ==========
-  taskCards: [],
+  taskCards: [
+    {
+      id: 1, emoji: '🤗', title: '给我一个拥抱',
+      desc: '现在！立刻！马上！我要一个大大的拥抱~',
+      type: 'action', color: '#d4a574', isSpecial: false
+    },
+    {
+      id: 2, emoji: '💬', title: '说出我的三个优点',
+      desc: '不许想太久哦，在你心里我有哪些优点？😊',
+      type: 'sweet', color: '#e8c4a0', isSpecial: false
+    },
+    {
+      id: 3, emoji: '🌟', title: '许一个愿望',
+      desc: '许一个愿望吧，我会努力帮你实现的！✨',
+      type: 'wish', color: '#c97b5d', isSpecial: false
+    },
+    {
+      id: 4, emoji: '🍰', title: '一起吃蛋糕',
+      desc: '生日怎么可以没有蛋糕！下次我们一起做一个吧~🎂',
+      type: 'action', color: '#d4a574', isSpecial: false
+    },
+    {
+      id: 5, emoji: '📸', title: '拍一张合照',
+      desc: '现在就用手机拍一张我们的合照吧！要笑着的哦~🤳',
+      type: 'action', color: '#e8c4a0', isSpecial: false
+    },
+    {
+      id: 6, emoji: '🎤', title: '唱一首歌给我听',
+      desc: '随便唱什么都好，你唱的歌最好听了~🎶',
+      type: 'challenge', color: '#c97b5d', isSpecial: false
+    },
+    {
+      id: 7, emoji: '✍️', title: '写一句情话',
+      desc: '在本子上写一句你想对我说的话，我要收藏起来！💌',
+      type: 'sweet', color: '#d4a574', isSpecial: false
+    },
+    {
+      id: 8, emoji: '☕', title: '一起喝杯东西',
+      desc: '忙完这个，我们去喝杯奶茶/咖啡吧，我请客！🥤',
+      type: 'action', color: '#e8c4a0', isSpecial: false
+    },
+    {
+      id: 9, emoji: '💝', title: '生日快乐！🎉',
+      desc: '找到这张隐藏卡不容易！你是我收到的最好的生日礼物❤️',
+      type: 'special', color: '#c97b5d', isSpecial: true
+    },
+  ],
   musicMemories: [],
   timeCapsule: [],
   starWishes: [],

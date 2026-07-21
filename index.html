@@ -871,6 +871,99 @@ body {
   50% { opacity: 1; transform: scale(1) rotate(180deg); }
 }
 
+/* ========== Task Cards ========== */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  max-width: 360px;
+  width: 100%;
+  perspective: 800px;
+}
+.task-card {
+  aspect-ratio: 3/4;
+  position: relative;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 12px;
+}
+.task-card.flipped {
+  transform: rotateY(180deg);
+}
+.task-card.done {
+  transform: rotateY(180deg);
+  filter: grayscale(0.6);
+  opacity: 0.7;
+  cursor: default;
+}
+.task-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.task-card-back {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  font-size: 36px;
+  z-index: 2;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.task-card-back .card-question {
+  font-size: 14px;
+  margin-top: 8px;
+  opacity: 0.8;
+}
+.task-card-front {
+  background: var(--light);
+  border: 2px solid var(--primary);
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+.task-card-front .card-emoji {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+.task-card-front .card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+.task-card-front .card-desc {
+  font-size: 12px;
+  color: #999;
+  line-height: 1.6;
+}
+.task-card-front .card-done-btn {
+  margin-top: 10px;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 20px;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.task-card-front .card-done-btn:active { transform: scale(0.95); }
+.task-card-front .card-done-btn:hover { opacity: 0.9; }
+@media (max-width: 380px) {
+  .task-grid { gap: 10px; }
+  .task-card-face { padding: 10px; }
+  .task-card-front .card-emoji { font-size: 24px; }
+  .task-card-front .card-title { font-size: 14px; }
+}
+
 /* ============================================
    Responsive
    ============================================ */
@@ -994,7 +1087,22 @@ body {
 </section>
 
 <!-- ============================================
-   Section 7: 结尾
+   Section 7: 甜蜜任务卡
+   ============================================ -->
+<section class="section" id="section-task-cards" data-section="taskCards" style="min-height:auto;padding:60px 20px;background:var(--bg);">
+  <h2 class="section-title">🎴 甜蜜任务卡</h2>
+  <p class="section-subtitle">翻开卡片，完成属于我们的小任务</p>
+  <div class="task-grid" id="taskGrid">
+    <!-- JS 动态渲染 -->
+  </div>
+  <div class="task-celebration" id="taskCelebration" style="display:none;text-align:center;margin-top:30px;">
+    <div style="font-size:48px;animation:heartbeat 1.2s ease-in-out infinite;">🎉</div>
+    <p style="font-size:18px;font-weight:600;color:var(--primary);margin-top:12px;">全部完成！你真是太棒了！💕</p>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 8: 结尾
    ============================================ -->
 <section class="section" id="section-ending" data-section="ending">
   <div class="ending-content">
@@ -1020,5 +1128,6 @@ body {
 <script src="config.js"></script>
 <script src="themes/birthday.js"></script>
 <script src="js/app.js"></script>
+<script src="sections/task-cards.js"></script>
 </body>
 </html>
