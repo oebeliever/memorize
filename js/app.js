@@ -8,28 +8,31 @@
 const ThemeManager = {
   current: CONFIG.theme || 'anniversary',
 
+  /** 获取指定主题的完整配置对象 */
+  getThemeConfig(name) {
+    if (name === 'birthday-vintage' && typeof BIRTHDAY_THEME !== 'undefined') {
+      return BIRTHDAY_THEME;
+    }
+    // 自定义主题或后备：从 themeCustom 读取自定义 CSS
+    const custom = CONFIG.themeCustom || {};
+    return {
+      css: {
+        '--primary': custom.primary || '#ff6b81',
+        '--secondary': custom.secondary || '#feca57',
+        '--accent': custom.accent || '#ff9ff3',
+        '--bg': custom.bg || '#fff5f7',
+        '--dark': custom.dark || '#2d3436',
+        '--light': custom.light || '#ffffff',
+        '--gradient1': custom.gradient1 || 'linear-gradient(135deg, #ff6b81 0%, #ff9ff3 100%)',
+        '--gradient2': custom.gradient2 || 'linear-gradient(135deg, #feca57 0%, #ff9ff3 100%)',
+        '--gradient3': custom.gradient3 || 'linear-gradient(135deg, #a29bfe 0%, #ff9ff3 100%)',
+      }
+    };
+  },
+
   apply(name) {
     const root = document.documentElement;
-    let themeConfig;
-
-    if (name === 'birthday-vintage' && typeof BIRTHDAY_THEME !== 'undefined') {
-      themeConfig = BIRTHDAY_THEME;
-    } else {
-      // 默认使用内置 CSS 变量（从 CONFIG.theme 映射）
-      themeConfig = {
-        css: {
-          '--primary': CONFIG.theme.primary || '#ff6b81',
-          '--secondary': CONFIG.theme.secondary || '#feca57',
-          '--accent': CONFIG.theme.accent || '#ff9ff3',
-          '--bg': CONFIG.theme.bg || '#fff5f7',
-          '--dark': CONFIG.theme.dark || '#2d3436',
-          '--light': CONFIG.theme.light || '#ffffff',
-          '--gradient1': CONFIG.theme.gradient1 || 'linear-gradient(135deg, #ff6b81 0%, #ff9ff3 100%)',
-          '--gradient2': CONFIG.theme.gradient2 || 'linear-gradient(135deg, #feca57 0%, #ff9ff3 100%)',
-          '--gradient3': CONFIG.theme.gradient3 || 'linear-gradient(135deg, #a29bfe 0%, #ff9ff3 100%)',
-        }
-      };
-    }
+    const themeConfig = this.getThemeConfig(name);
 
     Object.entries(themeConfig.css).forEach(([key, value]) => {
       root.style.setProperty(key, value);
@@ -40,7 +43,11 @@ const ThemeManager = {
 
   getCurrent() {
     return this.current;
-  }
+  },
+
+  // 兼容别名
+  applyTheme: function(name) { return this.apply(name); },
+  getCurrentTheme: function() { return this.getCurrent(); }
 };
 
 // 初始化主题
@@ -575,7 +582,7 @@ ThemeManager.apply(CONFIG.theme);
     wishes.forEach((wish, i) => {
       const bottle = document.createElement('div');
       bottle.className = 'wish-bottle';
-      bottle.style.background = wish.color || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#d4a574';
+      bottle.style.background = wish.color || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#ff6b81';
       bottle.textContent = bottleEmojis[i % bottleEmojis.length];
       bottle.style.animationDelay = `${i * 0.1}s`;
       bottle.addEventListener('click', () => openWish(wish));
