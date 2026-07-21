@@ -53,6 +53,28 @@ const ThemeManager = {
 // 初始化主题
 ThemeManager.apply(CONFIG.theme);
 
+// ========== 板块控制系统 ==========
+const SectionManager = {
+  config: CONFIG.sections,
+
+  isEnabled(name) {
+    return this.config.enabled.includes(name);
+  },
+
+  getOrdered() {
+    return this.config.order.filter(name => this.isEnabled(name));
+  },
+
+  init() {
+    document.querySelectorAll('[data-section]').forEach(el => {
+      const name = el.dataset.section;
+      if (!this.isEnabled(name)) {
+        el.style.display = 'none';
+      }
+    });
+  }
+};
+
 (function () {
   'use strict';
 
@@ -184,7 +206,23 @@ ThemeManager.apply(CONFIG.theme);
 
   // ========== Section 1: 开场 ==========
   function initOpening() {
-    const { couple, countdown } = CONFIG;
+    const { couple, countdown, occasion } = CONFIG;
+
+    // 从 occasion 获取标题
+    const titleEl = document.querySelector('.opening-title');
+    if (titleEl && occasion) {
+      titleEl.textContent = occasion.title;
+    }
+
+    // 心形 emoji 根据主题调整
+    const heartEl = document.querySelector('.opening-heart');
+    if (heartEl) {
+      if (CONFIG.theme === 'birthday-vintage') {
+        heartEl.textContent = '🎂';
+      } else {
+        heartEl.textContent = '💗';
+      }
+    }
 
     // 设置名字
     $('#openingNames').textContent = `${couple.nickname1 || couple.name1} & ${couple.nickname2 || couple.name2}`;
@@ -202,9 +240,12 @@ ThemeManager.apply(CONFIG.theme);
 
     // 倒计时
     $('#countdownTitle').textContent = countdown.title;
+    const countdownTarget = (occasion.type === 'birthday' && couple.birthday)
+      ? couple.birthday
+      : countdown.targetDate;
 
     function updateCountdown() {
-      const target = new Date(countdown.targetDate);
+      const target = new Date(countdownTarget);
       const now = new Date();
       let diff = target - now;
 
@@ -699,6 +740,9 @@ ThemeManager.apply(CONFIG.theme);
     },
     { passive: true }
   );
+
+  // ========== 板块启用控制 ==========
+  SectionManager.init();
 
   // ========== 启动完成 ==========
   console.log('💕 一周年纪念页面已就绪！');
