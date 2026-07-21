@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💕 一周年惊喜制作工具</title>
+<style>
+/* ============================================
+   Admin Tool Styles
+   ============================================ */
+:root {
+  --primary: #ff6b81;
+  --primary-dark: #e55a6e;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --border: #e9ecef;
+  --text: #2d3436;
+  --text-light: #6c757d;
+  --success: #00b894;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #ff6b81, #ff9ff3);
+  color: white;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 2px 16px rgba(255,107,129,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header h1 {
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.96); }
+.btn-primary {
+  background: white;
+  color: var(--primary);
+}
+.btn-primary:hover { background: #fff5f7; }
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+.btn-outline {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.5);
+  color: white;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.15); }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-danger { background: #ff4757; color: white; }
+
+/* Layout */
+.main-layout {
+  display: flex;
+  height: calc(100vh - 72px);
+}
+
+/* Sidebar Tabs */
+.sidebar {
+  width: 200px;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+.sidebar-nav {
+  list-style: none;
+  padding: 8px 0;
+}
+.sidebar-nav li {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  border-left: 3px solid transparent;
+  color: var(--text-light);
+}
+.sidebar-nav li:hover { background: #f8f9fa; color: var(--text); }
+.sidebar-nav li.active {
+  background: #fff5f7;
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+.sidebar-nav li .emoji { font-size: 18px; }
+
+/* Editor Panel */
+.editor-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 30px;
+  max-width: 600px;
+}
+.editor-section {
+  display: none;
+}
+.editor-section.active {
+  display: block;
+}
+
+.editor-section h2 {
+  font-size: 22px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.editor-section .sec-desc {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 24px;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.form-group .hint {
+  font-size: 11px;
+  color: var(--text-light);
+  font-weight: 400;
+  margin-left: 4px;
+}
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="url"],
+.form-group input[type="color"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  background: white;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+.form-group input[type="color"] {
+  width: 60px;
+  height: 40px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+/* Array items (timeline, gallery, wishes, quiz) */
+.array-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+.array-item .item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.array-item .item-number {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--primary);
+}
+.array-item .item-actions {
+  display: flex;
+  gap: 6px;
+}
+.array-item .item-actions button {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.array-item .item-actions button:hover { background: #f8f9fa; }
+.array-item .item-actions button.danger:hover {
+  background: #ffe0e0;
+  border-color: #ff4757;
+  color: #ff4757;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 12px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-light);
+  font-family: inherit;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+.add-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: #fff5f7;
+}
+
+/* Image upload */
+.img-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.img-upload .preview {
+  width: 60px; height: 60px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.img-upload input[type="file"] {
+  flex: 1;
+}
+
+/* Phone Preview */
+.preview-panel {
+  width: 380px;
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 20px;
+}
+.phone-frame {
+  width: 340px;
+  height: 680px;
+  background: white;
+  border-radius: 36px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 4px #2d2d3f, 0 0 0 6px #1a1a2e, 0 20px 60px rgba(0,0,0,0.4);
+}
+.phone-notch {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 24px;
+  background: #1a1a2e;
+  border-radius: 0 0 16px 16px;
+  z-index: 10;
+}
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 36px;
+}
+.phone-placeholder {
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 14px;
+  gap: 8px;
+}
+.phone-placeholder .big { font-size: 48px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2d3436;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 14px;
+  z-index: 9999;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+  pointer-events: none;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .preview-panel { display: none; }
+  .sidebar { width: 160px; }
+}
+@media (max-width: 768px) {
+  .main-layout { flex-direction: column; height: auto; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar-nav { display: flex; overflow-x: auto; padding: 8px; }
+  .sidebar-nav li {
+    white-space: nowrap;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  .sidebar-nav li.active { border-left-color: transparent; border-bottom-color: var(--primary); }
+  .editor-panel { padding: 16px; }
+  .header { padding: 14px 16px; }
+  .header h1 { font-size: 17px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <h1>💕 一周年惊喜制作工具</h1>
+  <div class="header-actions">
+    <button class="btn btn-outline btn-sm" onclick="resetConfig()">🔄 恢复默认</button>
+    <button class="btn btn-primary btn-sm" onclick="downloadConfig()">📥 下载配置</button>
+    <button class="btn btn-primary btn-sm" onclick="downloadFullHTML()">📦 导出完整页面</button>
+    <button class="btn btn-success btn-sm" onclick="applyAndPreview()">👁️ 预览效果</button>
+  </div>
+</div>
+
+<!-- Main Layout -->
+<div class="main-layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul class="sidebar-nav">
+      <li class="active" data-section="sec-basic">      <span class="emoji">💑</span> 基本信息</li>
+      <li data-section="sec-theme">                      <span class="emoji">🎨</span> 主题配色</li>
+      <li data-section="sec-music">                      <span class="emoji">🎵</span> 背景音乐</li>
+      <li data-section="sec-countdown">                  <span class="emoji">⏱️</span> 倒计时</li>
+      <li data-section="sec-timeline">                   <span class="emoji">💕</span> 爱情时间线</li>
+      <li data-section="sec-gallery">                    <span class="emoji">🖼️</span> 照片画廊</li>
+      <li data-section="sec-letter">                     <span class="emoji">💌</span> 情书内容</li>
+      <li data-section="sec-quiz">                       <span class="emoji">🎯</span> 心有灵犀测验</li>
+      <li data-section="sec-wishes">                     <span class="emoji">🏮</span> 心愿瓶留言</li>
+      <li data-section="sec-ending">                     <span class="emoji">🎆</span> 结尾惊喜</li>
+    </ul>
+  </nav>
+
+  <!-- Editor -->
+  <div class="editor-panel" id="editorPanel">
+    <!-- 动态生成 -->
+  </div>
+
+  <!-- Phone Preview -->
+  <div class="preview-panel">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <iframe class="phone-screen" id="previewFrame" src="index.html"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+// ============================================
+// Admin Tool Logic
+// ============================================
+
+// 当前编辑的数据（从 config.js 复制）
+let data = JSON.parse(JSON.stringify(CONFIG));
+
+// ========== Tab 切换 ==========
+document.querySelectorAll('.sidebar-nav li').forEach(li => {
+  li.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-nav li').forEach(l => l.classList.remove('active'));
+    li.classList.add('active');
+    renderSection(li.dataset.section);
+  });
+});
+
+// ========== 渲染编辑区 ==========
+function renderSection(sectionId) {
+  const panel = document.getElementById('editorPanel');
+  panel.innerHTML = '';
+
+  const html = getSectionHTML(sectionId);
+  panel.innerHTML = html;
+
+  // 绑定事件
+  bindSectionEvents(sectionId);
+}
+
+function getSectionHTML(id) {
+  switch(id) {
+    case 'sec-basic': return renderBasic();
+    case 'sec-theme': return renderTheme();
+    case 'sec-music': return renderMusic();
+    case 'sec-countdown': return renderCountdown();
+    case 'sec-timeline': return renderTimeline();
+    case 'sec-gallery': return renderGallery();
+    case 'sec-letter': return renderLetter();
+    case 'sec-quiz': return renderQuiz();
+    case 'sec-wishes': return renderWishes();
+    case 'sec-ending': return renderEnding();
+    default: return '<p>请选择一个编辑板块</p>';
+  }
+}
+
+// ========== 各板块渲染 ==========
+
+function renderBasic() {
+  const c = data.couple;
+  return `
+    <h2>💑 基本信息</h2>
+    <p class="sec-desc">设置你们的昵称、纪念日等基础信息</p>
+    <div class="form-group"><label>你的名字</label><input type="text" id="cfg-name1" value="${esc(c.name1)}"></div>
+    <div class="form-group"><label>TA的名字</label><input type="text" id="cfg-name2" value="${esc(c.name2)}"></div>
+    <div class="form-group"><label>你的昵称 <span class="hint">（带emoji更好看）</span></label><input type="text" id="cfg-nick1" value="${esc(c.nickname1)}"></div>
+    <div class="form-group"><label>TA的昵称 <span class="hint">（带emoji更好看）</span></label><input type="text" id="cfg-nick2" value="${esc(c.nickname2)}"></div>
+    <div class="form-group"><label>在一起的日子 📅</label><input type="date" id="cfg-anniversary" value="${c.anniversary}"></div>
+    <div class="form-group"><label>描述语</label><input type="text" id="cfg-desc" value="${esc(c.description)}"></div>
+  `;
+}
+
+function renderTheme() {
+  const t = data.theme;
+  let html = '<h2>🎨 主题配色</h2><p class="sec-desc">自定义页面的主色调和渐变色</p>';
+  const fields = [
+    ['primary','主色调（爱心粉）'],['secondary','辅助色（温暖金）'],['accent','强调色（浪漫紫粉）'],
+    ['bg','背景色'],['dark','深色文字'],['light','白色'],
+  ];
+  fields.forEach(([key,label]) => {
+    html += `<div class="form-group"><label>${label}</label><input type="color" id="cfg-theme-${key}" value="${t[key]}"></div>`;
+  });
+  html += '<div class="form-group"><label>渐变1</label><input type="text" id="cfg-theme-g1" value="'+esc(t.gradient1)+'"></div>';
+  html += '<div class="form-group"><label>渐变2</label><input type="text" id="cfg-theme-g2" value="'+esc(t.gradient2)+'"></div>';
+  html += '<div class="form-group"><label>渐变3</label><input type="text" id="cfg-theme-g3" value="'+esc(t.gradient3)+'"></div>';
+  return html;
+}
+
+function renderMusic() {
+  const m = data.music;
+  return `
+    <h2>🎵 背景音乐</h2>
+    <p class="sec-desc">设置页面背景音乐（可选）</p>
+    <div class="form-group"><label>音乐文件URL <span class="hint">（mp3链接或本地路径如 assets/music/bg.mp3）</span></label><input type="text" id="cfg-music-src" value="${esc(m.src)}"></div>
+    <div class="form-group"><label>音乐按钮文字</label><input type="text" id="cfg-music-title" value="${esc(m.title)}"></div>
+    <div class="form-group"><label>自动播放</label><select id="cfg-music-autoplay"><option value="0" ${m.autoplay?'':'selected'}>否（推荐）</option><option value="1" ${m.autoplay?'selected':''}>是</option></select></div>
+    <p style="color:#999;font-size:12px;">💡 微信浏览器通常禁止自动播放，建议保持"否"</p>
+  `;
+}
+
+function renderCountdown() {
+  const cd = data.countdown;
+  return `
+    <h2>⏱️ 倒计时设置</h2>
+    <p class="sec-desc">设置开场页面的倒计时目标日期</p>
+    <div class="form-group"><label>目标日期</label><input type="date" id="cfg-cd-date" value="${cd.targetDate}"></div>
+    <div class="form-group"><label>倒计时标题</label><input type="text" id="cfg-cd-title" value="${esc(cd.title)}"></div>
+    <div class="form-group"><label>提示文字</label><input type="text" id="cfg-cd-msg" value="${esc(cd.message)}"></div>
+  `;
+}
+
+function renderTimeline() {
+  const items = data.timeline;
+  let html = '<h2>💕 爱情时间线</h2><p class="sec-desc">添加你们的重要时刻（支持拖拽排序，点击🗑删除）</p>';
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">📌 第${i+1}个时刻</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'timeline\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'timeline\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'timeline\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>日期</label><input type="date" id="cfg-tl-date-${i}" value="${item.date}"></div>
+        <div class="form-group"><label>标题</label><input type="text" id="cfg-tl-title-${i}" value="${esc(item.title)}"></div>
+        <div class="form-group"><label>描述</label><textarea id="cfg-tl-desc-${i}">${esc(item.desc)}</textarea></div>
+        <div class="form-group"><label>Emoji</label><input type="text" id="cfg-tl-emoji-${i}" value="${esc(item.emoji)}"></div>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'timeline\')">+ 添加新的时刻</button>';
+  return html;
+}
+
+function renderGallery() {
+  const items = data.gallery;
+  let html = '<h2>🖼️ 照片画廊</h2><p class="sec-desc">添加你们的照片（支持URL或本地文件路径）</p>';
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">📷 第${i+1}张照片</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'gallery\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'gallery\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'gallery\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>图片路径</label><input type="text" id="cfg-gal-src-${i}" value="${esc(item.src)}" placeholder="assets/photos/photo1.jpg 或 https://..."></div>
+        <div class="form-group"><label>标题</label><input type="text" id="cfg-gal-cap-${i}" value="${esc(item.caption)}"></div>
+        <div class="form-group"><label>描述</label><input type="text" id="cfg-gal-desc-${i}" value="${esc(item.desc)}"></div>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'gallery\')">+ 添加新照片</button>';
+  return html;
+}
+
+function renderLetter() {
+  const l = data.loveLetter;
+  let html = '<h2>💌 情书内容</h2><p class="sec-desc">写下你想对TA说的心里话</p>';
+  html += `<div class="form-group"><label>标题</label><input type="text" id="cfg-letter-title" value="${esc(l.title)}"></div>`;
+  html += `<div class="form-group"><label>开头称呼</label><input type="text" id="cfg-letter-greet" value="${esc(l.greeting)}"></div>`;
+  html += '<div class="form-group"><label>正文段落 <span class="hint">（每段作为一行，段落之间用空行分隔）</span></label><textarea id="cfg-letter-body" style="min-height:200px;">'+esc(l.paragraphs.join('\n\n'))+'</textarea></div>';
+  html += `<div class="form-group"><label>落款</label><input type="text" id="cfg-letter-close" value="${esc(l.closing)}"></div>`;
+  html += `<div class="form-group"><label>签名</label><input type="text" id="cfg-letter-sign" value="${esc(l.signature)}"></div>`;
+  html += `<div class="form-group"><label>日期</label><input type="date" id="cfg-letter-date" value="${l.date}"></div>`;
+  return html;
+}
+
+function renderQuiz() {
+  const q = data.quiz;
+  let html = '<h2>🎯 心有灵犀测验</h2><p class="sec-desc">设计关于你们的趣味问答</p>';
+  html += `<div class="form-group"><label>测验标题</label><input type="text" id="cfg-quiz-title" value="${esc(q.title)}"></div>`;
+  html += `<div class="form-group"><label>副标题</label><input type="text" id="cfg-quiz-sub" value="${esc(q.subtitle)}"></div>`;
+  html += '<hr style="margin:20px 0;border-color:#eee;">';
+  q.questions.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">❓ 第${i+1}题</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'quiz\','+i+',-1)">▲</button>' : ''}
+            ${i<q.questions.length-1 ? '<button onclick="moveArrayItem(\'quiz\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'quiz\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>题目</label><input type="text" id="cfg-qz-q-${i}" value="${esc(item.question)}"></div>
+        <div class="form-group"><label>选项A</label><input type="text" id="cfg-qz-a-${i}-0" value="${esc(item.options[0])}"></div>
+        <div class="form-group"><label>选项B</label><input type="text" id="cfg-qz-a-${i}-1" value="${esc(item.options[1])}"></div>
+        <div class="form-group"><label>选项C</label><input type="text" id="cfg-qz-a-${i}-2" value="${esc(item.options[2])}"></div>
+        <div class="form-group"><label>选项D</label><input type="text" id="cfg-qz-a-${i}-3" value="${esc(item.options[3])}"></div>
+        <div class="form-group"><label>正确答案（0=A, 1=B, 2=C, 3=D）</label><input type="number" id="cfg-qz-ans-${i}" value="${item.answer}" min="0" max="3" style="width:80px;"></div>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'quiz\')">+ 添加新题目</button>';
+  return html;
+}
+
+function renderWishes() {
+  const items = data.wishes;
+  let html = '<h2>🏮 心愿瓶留言</h2><p class="sec-desc">藏在瓶子里的甜蜜留言，点击瓶子才会显示哦</p>';
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">💝 心愿 #${item.id||(i+1)}</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'wishes\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'wishes\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'wishes\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>留言内容</label><textarea id="cfg-wish-text-${i}">${esc(item.text)}</textarea></div>
+        <div class="form-group"><label>署名</label><input type="text" id="cfg-wish-from-${i}" value="${esc(item.from)}"></div>
+        <div class="form-group"><label>瓶子颜色</label><input type="color" id="cfg-wish-color-${i}" value="${item.color}"></div>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'wishes\')">+ 添加心愿</button>';
+  return html;
+}
+
+function renderEnding() {
+  const e = data.ending;
+  let html = '<h2>🎆 结尾惊喜</h2><p class="sec-desc">设置最后一页的告白和烟花效果</p>';
+  html += `<div class="form-group"><label>标题</label><input type="text" id="cfg-end-title" value="${esc(e.title)}"></div>`;
+  html += `<div class="form-group"><label>告白文字 <span class="hint">（\\n换行）</span></label><textarea id="cfg-end-msg" style="min-height:120px;">${esc(e.message)}</textarea></div>`;
+  html += `<div class="form-group"><label>签名行</label><input type="text" id="cfg-end-sign" value="${esc(e.signatureLine)}"></div>`;
+  html += `<div class="form-group"><label>日期</label><input type="text" id="cfg-end-date" value="${esc(e.date)}"></div>`;
+  html += `<div class="form-group"><label>小彩蛋（点击后显示）</label><textarea id="cfg-end-egg">${esc(e.easterEgg)}</textarea></div>`;
+  return html;
+}
+
+// ========== 事件绑定 ==========
+function bindSectionEvents(sectionId) {
+  // 所有输入框修改时自动同步到 data
+  document.querySelectorAll('#editorPanel input, #editorPanel textarea, #editorPanel select').forEach(el => {
+    el.addEventListener('input', () => syncFromForm(sectionId));
+    el.addEventListener('change', () => syncFromForm(sectionId));
+  });
+}
+
+function syncFromForm(sectionId) {
+  // 从表单同步数据到 data 对象
+  const prefix = sectionId.replace('sec-','');
+
+  switch(sectionId) {
+    case 'sec-basic':
+      data.couple.name1 = val('cfg-name1');
+      data.couple.name2 = val('cfg-name2');
+      data.couple.nickname1 = val('cfg-nick1');
+      data.couple.nickname2 = val('cfg-nick2');
+      data.couple.anniversary = val('cfg-anniversary');
+      data.couple.description = val('cfg-desc');
+      break;
+    case 'sec-theme':
+      data.theme.primary = val('cfg-theme-primary');
+      data.theme.secondary = val('cfg-theme-secondary');
+      data.theme.accent = val('cfg-theme-accent');
+      data.theme.bg = val('cfg-theme-bg');
+      data.theme.dark = val('cfg-theme-dark');
+      data.theme.light = val('cfg-theme-light');
+      data.theme.gradient1 = val('cfg-theme-g1');
+      data.theme.gradient2 = val('cfg-theme-g2');
+      data.theme.gradient3 = val('cfg-theme-g3');
+      break;
+    case 'sec-music':
+      data.music.src = val('cfg-music-src');
+      data.music.title = val('cfg-music-title');
+      data.music.autoplay = val('cfg-music-autoplay') === '1';
+      break;
+    case 'sec-countdown':
+      data.countdown.targetDate = val('cfg-cd-date');
+      data.countdown.title = val('cfg-cd-title');
+      data.countdown.message = val('cfg-cd-msg');
+      break;
+    case 'sec-timeline':
+      data.timeline.forEach((item,i) => {
+        item.date = val(`cfg-tl-date-${i}`);
+        item.title = val(`cfg-tl-title-${i}`);
+        item.desc = val(`cfg-tl-desc-${i}`);
+        item.emoji = val(`cfg-tl-emoji-${i}`);
+      });
+      break;
+    case 'sec-gallery':
+      data.gallery.forEach((item,i) => {
+        item.src = val(`cfg-gal-src-${i}`);
+        item.caption = val(`cfg-gal-cap-${i}`);
+        item.desc = val(`cfg-gal-desc-${i}`);
+      });
+      break;
+    case 'sec-letter':
+      data.loveLetter.title = val('cfg-letter-title');
+      data.loveLetter.greeting = val('cfg-letter-greet');
+      data.loveLetter.paragraphs = val('cfg-letter-body').split('\n\n').filter(p => p.trim());
+      data.loveLetter.closing = val('cfg-letter-close');
+      data.loveLetter.signature = val('cfg-letter-sign');
+      data.loveLetter.date = val('cfg-letter-date');
+      break;
+    case 'sec-quiz':
+      data.quiz.title = val('cfg-quiz-title');
+      data.quiz.subtitle = val('cfg-quiz-sub');
+      data.quiz.questions.forEach((item,i) => {
+        item.question = val(`cfg-qz-q-${i}`);
+        item.options[0] = val(`cfg-qz-a-${i}-0`);
+        item.options[1] = val(`cfg-qz-a-${i}-1`);
+        item.options[2] = val(`cfg-qz-a-${i}-2`);
+        item.options[3] = val(`cfg-qz-a-${i}-3`);
+        item.answer = parseInt(val(`cfg-qz-ans-${i}`)) || 0;
+      });
+      break;
+    case 'sec-wishes':
+      data.wishes.forEach((item,i) => {
+        item.text = val(`cfg-wish-text-${i}`);
+        item.from = val(`cfg-wish-from-${i}`);
+        item.color = val(`cfg-wish-color-${i}`);
+      });
+      break;
+    case 'sec-ending':
+      data.ending.title = val('cfg-end-title');
+      data.ending.message = val('cfg-end-msg');
+      data.ending.signatureLine = val('cfg-end-sign');
+      data.ending.date = val('cfg-end-date');
+      data.ending.easterEgg = val('cfg-end-egg');
+      break;
+  }
+}
+
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+// ========== 数组操作 ==========
+function addArrayItem(type) {
+  switch(type) {
+    case 'timeline':
+      data.timeline.push({ date: '', title: '新时刻', desc: '描述...', emoji: '💕' });
+      break;
+    case 'gallery':
+      data.gallery.push({ src: '', caption: '新照片', desc: '描述...' });
+      break;
+    case 'quiz':
+      data.quiz.questions.push({ question: '新题目？', options: ['选项A','选项B','选项C','选项D'], answer: 0 });
+      break;
+    case 'wishes':
+      data.wishes.push({ id: data.wishes.length+1, text: '新的心愿留言...', from: '署名', color: '#ff6b81' });
+      break;
+  }
+  // 刷新当前section
+  const activeTab = document.querySelector('.sidebar-nav li.active');
+  if (activeTab) renderSection(activeTab.dataset.section);
+}
+
+function deleteArrayItem(type, index) {
+  if (!confirm('确定删除这一项吗？')) return;
+  switch(type) {
+    case 'timeline': data.timeline.splice(index, 1); break;
+    case 'gallery': data.gallery.splice(index, 1); break;
+    case 'quiz': data.quiz.questions.splice(index, 1); break;
+    case 'wishes': data.wishes.splice(index, 1); break;
+  }
+  const activeTab = document.querySelector('.sidebar-nav li.active');
+  if (activeTab) renderSection(activeTab.dataset.section);
+}
+
+function moveArrayItem(type, index, direction) {
+  const arr = (() => {
+    switch(type) {
+      case 'timeline': return data.timeline;
+      case 'gallery': return data.gallery;
+      case 'quiz': return data.quiz.questions;
+      case 'wishes': return data.wishes;
+    }
+  })();
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= arr.length) return;
+  [arr[index], arr[newIndex]] = [arr[newIndex], arr[index]];
+  const activeTab = document.querySelector('.sidebar-nav li.active');
+  if (activeTab) renderSection(activeTab.dataset.section);
+}
+
+// ========== 工具函数 ==========
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+// ========== 导出功能 ==========
+function generateConfigJS() {
+  return `/**
+ * ============================================
+ *  💕 一周年纪念 — 配置文件
+ *  由制作工具自动生成
+ * ============================================
+ */
+
+const CONFIG = ${JSON.stringify(data, null, 2)};
+`;
+}
+
+function downloadConfig() {
+  const content = generateConfigJS();
+  const blob = new Blob([content], { type: 'application/javascript' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'config.js';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ config.js 已下载！替换项目中的原文件即可');
+}
+
+async function downloadFullHTML() {
+  showToast('⏳ 正在生成完整页面...');
+
+  try {
+    // 读取 index.html
+    const resp = await fetch('index.html');
+    let html = await resp.text();
+
+    // 读取 app.js
+    const jsResp = await fetch('js/app.js');
+    let js = await jsResp.text();
+
+    // 生成新的 config.js 内容
+    const configJS = generateConfigJS();
+
+    // 替换外部引用为内联
+    // 1. 删除外部 config.js 引用，替换为内联
+    html = html.replace(
+      /<script src="config\.js"><\/script>/,
+      '<script>'+configJS+'</scr'+'ipt>'
+    );
+
+    // 2. 删除外部 app.js 引用，替换为内联
+    html = html.replace(
+      /<script src="js\/app\.js"><\/script>/,
+      '<script>'+js+'</scr'+'ipt>'
+    );
+
+    // 3. 删除 CSS 外部链接（如果有的话），CSS 已经在 style 标签中
+
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'anniversary.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ 完整页面已导出！单文件可直接部署');
+  } catch(e) {
+    showToast('❌ 导出失败：' + e.message + '（请确保通过本地服务器打开此页面）');
+  }
+}
+
+function resetConfig() {
+  if (!confirm('确定恢复为默认配置吗？你当前的修改将丢失。')) return;
+  data = JSON.parse(JSON.stringify(CONFIG));
+  const activeTab = document.querySelector('.sidebar-nav li.active');
+  if (activeTab) renderSection(activeTab.dataset.section);
+  showToast('🔄 已恢复默认配置');
+}
+
+function applyAndPreview() {
+  const frame = document.getElementById('previewFrame');
+  if (frame) {
+    showToast('👁️ 请在右侧手机预览中查看效果（需要先保存配置）');
+    // 刷新预览
+    frame.src = frame.src;
+  }
+}
+
+// ========== 初始化 ==========
+renderSection('sec-basic');
+console.log('💕 一周年惊喜制作工具已就绪！');
+console.log('📝 在左侧编辑内容 → 点击"导出完整页面"获取成品');
+</script>
+</body>
+</html>

@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!-- 微信分享 -->
+<meta property="og:title" content="我们的一周年 💕">
+<meta property="og:description" content="点击查看一份特别的惊喜~">
+<meta property="og:type" content="website">
+<title>我们的一周年 💕</title>
+<style>
+/* ============================================
+   CSS Reset & Variables
+   ============================================ */
+:root {
+  --primary: #ff6b81;
+  --secondary: #feca57;
+  --accent: #ff9ff3;
+  --bg: #fff5f7;
+  --dark: #2d3436;
+  --light: #ffffff;
+  --gradient1: linear-gradient(135deg, #ff6b81 0%, #ff9ff3 100%);
+  --gradient2: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+  --gradient3: linear-gradient(135deg, #a29bfe 0%, #ff9ff3 100%);
+  --shadow: 0 4px 24px rgba(255,107,129,0.15);
+  --shadow-lg: 0 12px 40px rgba(255,107,129,0.2);
+  --radius: 16px;
+  --radius-lg: 24px;
+  --font-title: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: y proximity;
+}
+
+body {
+  font-family: var(--font-title);
+  background: var(--bg);
+  color: var(--dark);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ============================================
+   Global Components
+   ============================================ */
+
+/* Particle Canvas */
+#particles-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Music Toggle */
+.music-toggle {
+  position: fixed;
+  top: 20px; right: 20px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  animation: float 3s ease-in-out infinite;
+}
+.music-toggle:active { transform: scale(0.9); }
+.music-toggle.playing { background: var(--primary); }
+
+/* Scroll Down Hint */
+.scroll-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.8);
+  font-size: 13px;
+  letter-spacing: 2px;
+  animation: bounce 2s ease-in-out infinite;
+  z-index: 10;
+}
+.scroll-hint .arrow {
+  width: 24px; height: 24px;
+  border-right: 2px solid rgba(255,255,255,0.8);
+  border-bottom: 2px solid rgba(255,255,255,0.8);
+  transform: rotate(45deg);
+}
+
+/* Section Common */
+.section {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+  background: var(--gradient1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-subtitle {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+}
+
+/* ============================================
+   Section 1: Opening
+   ============================================ */
+#section-opening {
+  background: linear-gradient(135deg, #ff6b81 0%, #ff9ff3 40%, #a29bfe 100%);
+  color: white;
+  text-align: center;
+}
+
+.opening-stars {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+.opening-content {
+  position: relative;
+  z-index: 5;
+}
+
+.opening-heart {
+  font-size: 64px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.opening-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  animation: fadeInUp 1s ease-out;
+}
+
+.opening-names {
+  font-size: 22px;
+  margin-bottom: 24px;
+  opacity: 0.9;
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.opening-days {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 20px;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+.opening-days .number {
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1;
+}
+.opening-days .unit {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+/* Countdown */
+.countdown-box {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.3);
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+.countdown-box .countdown-title {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+.countdown-timer {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 54px;
+}
+.countdown-item .num {
+  font-size: 32px;
+  font-weight: 800;
+  background: rgba(255,255,255,0.25);
+  border-radius: 12px;
+  padding: 8px 10px;
+  line-height: 1;
+  min-width: 50px;
+}
+.countdown-item .lbl {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.countdown-sep {
+  font-size: 28px;
+  font-weight: 300;
+  opacity: 0.5;
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+/* ============================================
+   Section 2: Timeline
+   ============================================ */
+#section-timeline {
+  background: var(--bg);
+  justify-content: flex-start;
+  padding-top: 60px;
+  padding-bottom: 60px;
+  min-height: auto;
+}
+
+.timeline-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  padding-left: 30px;
+}
+.timeline-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 13px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--primary), var(--accent), var(--secondary));
+  border-radius: 1px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.6s ease-out;
+}
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -30px;
+  top: 4px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--gradient1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 12px rgba(255,107,129,0.3);
+  z-index: 2;
+  transform: translateX(-13px);
+}
+
+.timeline-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--primary);
+}
+.timeline-card .t-date {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.timeline-card .t-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 4px 0 6px;
+  color: var(--dark);
+}
+.timeline-card .t-desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.7;
+}
+
+/* ============================================
+   Section 3: Gallery
+   ============================================ */
+#section-gallery {
+  background: linear-gradient(180deg, #fff5f7 0%, #ffeef2 50%, #fff5f7 100%);
+  position: relative;
+}
+
+.gallery-container {
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  touch-action: pan-y;
+}
+
+.gallery-track {
+  display: flex;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+.gallery-slide {
+  min-width: 100%;
+  padding: 0 12px;
+  text-align: center;
+}
+
+.gallery-frame {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  aspect-ratio: 3/4;
+  background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+}
+
+.gallery-frame img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-frame .placeholder-img {
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  background: var(--gradient2);
+  color: white;
+}
+
+.gallery-caption {
+  margin-top: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--dark);
+}
+.gallery-desc {
+  font-size: 13px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.gallery-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 20px;
+}
+.gallery-dot {
+  width: 8px; height: 8px;
+  border-radius: 4px;
+  background: #ddd;
+  transition: all 0.3s ease;
+}
+.gallery-dot.active {
+  width: 24px;
+  background: var(--primary);
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.gallery-nav:active { transform: translateY(-50%) scale(0.9); }
+.gallery-nav.prev { left: 0; }
+.gallery-nav.next { right: 0; }
+
+/* ============================================
+   Section 4: Love Letter
+   ============================================ */
+#section-letter {
+  background: linear-gradient(180deg, #fff5f7 0%, #f8f0ff 100%);
+}
+
+.envelope-container {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.envelope {
+  position: relative;
+  width: 100%;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.4s ease;
+}
+.envelope:active { transform: scale(0.98); }
+
+.envelope-front {
+  padding: 40px 30px;
+  text-align: center;
+  background: linear-gradient(135deg, #fff9fa, #fff0f3);
+  transition: all 0.5s ease;
+}
+.envelope.opened .envelope-front {
+  opacity: 0;
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.envelope-seal {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--gradient1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 16px rgba(255,107,129,0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.envelope-letter {
+  padding: 0 30px;
+  max-height: 0;
+  overflow-y: auto;
+  transition: all 0.6s ease;
+  background: linear-gradient(180deg, #fffef9, #fffdf5);
+}
+.envelope.opened .envelope-letter {
+  max-height: 400px;
+  padding: 30px;
+}
+
+.letter-greeting {
+  font-size: 15px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.letter-body {
+  font-size: 15px;
+  color: #555;
+  line-height: 2;
+}
+.letter-body p { margin-bottom: 12px; text-indent: 2em; }
+.letter-closing {
+  text-align: right;
+  margin-top: 20px;
+  font-size: 15px;
+  color: var(--dark);
+}
+.letter-closing .name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 8px;
+}
+.letter-date {
+  text-align: right;
+  font-size: 12px;
+  color: #bbb;
+  margin-top: 8px;
+}
+
+/* ============================================
+   Section 5: Quiz
+   ============================================ */
+#section-quiz {
+  background: linear-gradient(180deg, #f8f0ff 0%, #fff5f7 100%);
+}
+
+.quiz-container {
+  width: 100%;
+  max-width: 380px;
+}
+
+.quiz-progress {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.quiz-progress-dot {
+  width: 28px; height: 4px;
+  border-radius: 2px;
+  background: #e0e0e0;
+  transition: all 0.3s ease;
+}
+.quiz-progress-dot.done { background: var(--accent); }
+.quiz-progress-dot.current { background: var(--primary); }
+
+.quiz-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  transition: all 0.4s ease;
+}
+.quiz-card.slide-out {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.quiz-question-num {
+  display: inline-block;
+  background: var(--gradient1);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+.quiz-question {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--dark);
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.quiz-option {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid #f0f0f0;
+  border-radius: var(--radius);
+  background: white;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quiz-option:active { transform: scale(0.97); }
+.quiz-option.correct {
+  border-color: #00b894;
+  background: #e6fff8;
+  animation: correctPop 0.5s ease;
+}
+.quiz-option.wrong {
+  border-color: var(--primary);
+  background: #fff0f3;
+  animation: shake 0.5s ease;
+}
+.quiz-option .opt-letter {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.quiz-result {
+  text-align: center;
+  animation: fadeInUp 0.6s ease-out;
+}
+.quiz-result .result-emoji { font-size: 64px; display: block; margin-bottom: 12px; }
+.quiz-result .result-score { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.quiz-result .result-text { font-size: 15px; color: #666; line-height: 1.8; margin-bottom: 20px; }
+.quiz-restart {
+  padding: 12px 32px;
+  border-radius: 30px;
+  background: var(--gradient1);
+  color: white;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: var(--shadow);
+}
+.quiz-restart:active { transform: scale(0.95); }
+
+/* ============================================
+   Section 6: Wishes (Message Bottles)
+   ============================================ */
+#section-wishes {
+  background: linear-gradient(180deg, #fff5f7 0%, #e8f8f5 50%, #fff5f7 100%);
+  min-height: auto;
+  padding: 60px 20px;
+}
+
+.wishes-sea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  max-width: 400px;
+}
+
+.wish-bottle {
+  width: 100px;
+  height: 130px;
+  border-radius: 20px 20px 16px 16px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.wish-bottle:hover { transform: translateY(-4px) scale(1.03); }
+.wish-bottle:active { transform: scale(0.95); }
+.wish-bottle::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  width: 28px; height: 12px;
+  border-radius: 6px 6px 0 0;
+  background: inherit;
+  opacity: 0.8;
+}
+.wish-bottle.opened {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+/* Wish Modal */
+.wish-modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.wish-modal {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  margin: 20px;
+  max-width: 340px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.wish-modal .wish-emoji { font-size: 48px; margin-bottom: 12px; }
+.wish-modal .wish-text { font-size: 16px; color: #555; line-height: 1.9; margin-bottom: 16px; }
+.wish-modal .wish-from { font-size: 13px; color: var(--primary); font-weight: 600; }
+.wish-modal .wish-close {
+  margin-top: 20px;
+  padding: 10px 30px;
+  border-radius: 25px;
+  border: 2px solid var(--primary);
+  background: white;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ============================================
+   Section 7: Ending
+   ============================================ */
+#section-ending {
+  background: linear-gradient(135deg, #2d1b3d 0%, #1a1a2e 50%, #2d1b3d 100%);
+  color: white;
+  text-align: center;
+  position: relative;
+}
+
+.firework {
+  position: absolute;
+  pointer-events: none;
+  animation: fireworkBurst 1.5s ease-out forwards;
+}
+
+.ending-content {
+  position: relative;
+  z-index: 5;
+}
+
+.ending-stars {
+  font-size: 32px;
+  margin-bottom: 16px;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.ending-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  text-shadow: 0 0 30px rgba(255,154,243,0.4);
+}
+
+.ending-message {
+  font-size: 16px;
+  line-height: 2.2;
+  opacity: 0.9;
+  margin-bottom: 28px;
+  white-space: pre-line;
+}
+
+.ending-signature {
+  font-size: 15px;
+  opacity: 0.7;
+  font-style: italic;
+  margin-bottom: 4px;
+}
+
+.ending-date {
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  opacity: 0.6;
+}
+
+.ending-easter-egg {
+  margin-top: 32px;
+  font-size: 13px;
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+.ending-easter-egg:hover { opacity: 0.8; }
+.ending-easter-egg.revealed {
+  opacity: 0.9;
+  font-size: 15px;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* ============================================
+   Keyframe Animations
+   ============================================ */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+  60% { transform: scale(1); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(10px); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(255,107,129,0.3); }
+  50% { box-shadow: 0 4px 28px rgba(255,107,129,0.5); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+@keyframes correctPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fireworkBurst {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (min-width: 480px) {
+  .section { padding: 60px 30px; }
+  .opening-title { font-size: 42px; }
+  .section-title { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 飘落粒子画布 -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- 音乐按钮 -->
+<button class="music-toggle" id="musicToggle" aria-label="音乐开关">🎵</button>
+
+<!-- ============================================
+   Section 1: 开场
+   ============================================ -->
+<section class="section" id="section-opening">
+  <div class="opening-content">
+    <span class="opening-heart">💗</span>
+    <h1 class="opening-title">我们的一周年</h1>
+    <p class="opening-names" id="openingNames">🐻 小明 &amp; 小红 🐰</p>
+    <div class="opening-days" id="openingDays">
+      <span class="number" id="daysCount">--</span>
+      <span class="unit">天</span>
+    </div>
+    <p style="opacity:0.85;font-size:14px;animation:fadeInUp 1s ease-out 0.5s both;" id="openingDesc">从相遇的那天起，每一天都变得有意义 ✨</p>
+
+    <!-- 倒计时 -->
+    <div class="countdown-box" id="countdownBox">
+      <div class="countdown-title" id="countdownTitle">距离我们的一周年</div>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-item"><span class="num" id="cd-days">00</span><span class="lbl">天</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-item"><span class="num" id="cd-hours">00</span><span class="lbl">时</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-item"><span class="num" id="cd-minutes">00</span><span class="lbl">分</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-item"><span class="num" id="cd-seconds">00</span><span class="lbl">秒</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>向上滑动</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 2: 爱情时间线
+   ============================================ -->
+<section class="section" id="section-timeline">
+  <h2 class="section-title">💕 我们的爱情时间线</h2>
+  <p class="section-subtitle">每一刻都值得被记住</p>
+  <div class="timeline-wrapper" id="timelineWrapper">
+    <!-- JS 动态填充 -->
+  </div>
+</section>
+
+<!-- ============================================
+   Section 3: 照片画廊
+   ============================================ -->
+<section class="section" id="section-gallery">
+  <h2 class="section-title">🖼️ 我们的美好瞬间</h2>
+  <p class="section-subtitle">滑动查看我们的回忆</p>
+  <div class="gallery-container" id="galleryContainer">
+    <button class="gallery-nav prev" id="galleryPrev">◀</button>
+    <div class="gallery-track" id="galleryTrack">
+      <!-- JS 动态填充 -->
+    </div>
+    <button class="gallery-nav next" id="galleryNext">▶</button>
+    <div class="gallery-dots" id="galleryDots"></div>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 4: 情书
+   ============================================ -->
+<section class="section" id="section-letter">
+  <h2 class="section-title">💌 写给你的一封信</h2>
+  <p class="section-subtitle">点击信封打开</p>
+  <div class="envelope-container">
+    <div class="envelope" id="envelope">
+      <div class="envelope-front">
+        <div class="envelope-seal">💝</div>
+        <p style="font-size:16px;color:#666;">📨 有一封给你的信</p>
+        <p style="font-size:12px;color:#bbb;margin-top:4px;">点击打开 💌</p>
+      </div>
+      <div class="envelope-letter" id="letterContent">
+        <!-- JS 动态填充 -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 5: 心有灵犀小测验
+   ============================================ -->
+<section class="section" id="section-quiz">
+  <h2 class="section-title">🎯 心有灵犀</h2>
+  <p class="section-subtitle">看看你有多了解TA？</p>
+  <div class="quiz-container" id="quizContainer">
+    <!-- JS 动态填充 -->
+  </div>
+</section>
+
+<!-- ============================================
+   Section 6: 心愿瓶
+   ============================================ -->
+<section class="section" id="section-wishes">
+  <h2 class="section-title">🏮 心愿瓶</h2>
+  <p class="section-subtitle">点击瓶子捞起一份心意</p>
+  <div class="wishes-sea" id="wishesSea">
+    <!-- JS 动态填充 -->
+  </div>
+</section>
+
+<!-- ============================================
+   Section 7: 结尾
+   ============================================ -->
+<section class="section" id="section-ending">
+  <div class="ending-content">
+    <div class="ending-stars">✨💕✨</div>
+    <h2 class="ending-title" id="endingTitle">🎆 一周年快乐</h2>
+    <div class="ending-message" id="endingMessage">
+      从0到1，从1到∞<br>我们的故事才刚刚开始<br>谢谢你出现在我的生命里<br>让一切变得如此美好
+    </div>
+    <p class="ending-signature" id="endingSignature">— 永远爱你的 小明 —</p>
+    <p class="ending-date" id="endingDate">2026.06.06</p>
+    <p class="ending-easter-egg" id="easterEgg">
+      💝 点击这里有个小秘密
+    </p>
+  </div>
+</section>
+
+<!-- 心愿弹窗 -->
+<div id="wishModal" style="display:none;"></div>
+
+<!-- ============================================
+   Scripts
+   ============================================ -->
+<script src="config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
