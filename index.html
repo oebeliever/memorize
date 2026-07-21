@@ -871,6 +871,121 @@ body {
   50% { opacity: 1; transform: scale(1) rotate(180deg); }
 }
 
+/* ========== Music Memories ========== */
+.record-player {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: var(--light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.record-disc {
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: #1a1a1a;
+  position: relative;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.record-disc.playing {
+  animation: spin 2s linear infinite;
+}
+.record-label {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+}
+.record-arm {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 60px; height: 6px;
+  background: #888;
+  border-radius: 3px;
+  transform-origin: right center;
+  transform: rotate(-15deg);
+  transition: transform 0.5s ease;
+}
+.record-arm.playing { transform: rotate(-5deg); }
+.record-arm::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: -4px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #666;
+}
+.record-info {
+  text-align: center;
+  margin-top: 20px;
+}
+.record-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark);
+}
+.record-artist {
+  font-size: 14px;
+  color: #999;
+  margin-top: 4px;
+}
+.record-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 16px;
+}
+.record-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: #f0f0f0;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.record-btn:active { transform: scale(0.9); }
+.play-btn {
+  width: 56px; height: 56px;
+  background: var(--primary);
+  color: white;
+  font-size: 20px;
+}
+.record-memory {
+  margin-top: 16px;
+  padding: 16px;
+  background: #fdf6ee;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  text-align: center;
+  width: 100%;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ========== Task Cards ========== */
 .task-grid {
   display: grid;
@@ -1045,7 +1160,33 @@ body {
 </section>
 
 <!-- ============================================
-   Section 4: 情书
+   Section 4: 音乐回忆簿
+   ============================================ -->
+<section class="section" id="section-music-memories" data-section="musicMemories" style="background:var(--bg);">
+  <h2 class="section-title">🎵 音乐回忆簿</h2>
+  <p class="section-subtitle">每一首歌，都是我们的故事</p>
+  <div class="record-player" id="recordPlayer">
+    <div class="record-disc" id="recordDisc">
+      <div class="record-label" id="recordLabel">🎵</div>
+    </div>
+    <div class="record-arm" id="recordArm"></div>
+    <div class="record-info" id="recordInfo">
+      <div class="record-title" id="recordTitle">我们的歌</div>
+      <div class="record-artist" id="recordArtist">歌手名</div>
+    </div>
+    <div class="record-controls">
+      <button class="record-btn" id="recordPrev">⏮</button>
+      <button class="record-btn play-btn" id="recordPlay">▶</button>
+      <button class="record-btn" id="recordNext">⏭</button>
+    </div>
+    <div class="record-memory" id="recordMemory">
+      <!-- 回忆文字 -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 5: 情书
    ============================================ -->
 <section class="section" id="section-letter" data-section="letter">
   <h2 class="section-title">💌 写给你的一封信</h2>
@@ -1065,7 +1206,7 @@ body {
 </section>
 
 <!-- ============================================
-   Section 5: 心有灵犀小测验
+   Section 6: 心有灵犀小测验
    ============================================ -->
 <section class="section" id="section-quiz" data-section="quiz">
   <h2 class="section-title">🎯 心有灵犀</h2>
@@ -1076,7 +1217,7 @@ body {
 </section>
 
 <!-- ============================================
-   Section 6: 心愿瓶
+   Section 7: 心愿瓶
    ============================================ -->
 <section class="section" id="section-wishes" data-section="wishes">
   <h2 class="section-title">🏮 心愿瓶</h2>
@@ -1087,7 +1228,7 @@ body {
 </section>
 
 <!-- ============================================
-   Section 7: 甜蜜任务卡
+   Section 8: 甜蜜任务卡
    ============================================ -->
 <section class="section" id="section-task-cards" data-section="taskCards" style="min-height:auto;padding:60px 20px;background:var(--bg);">
   <h2 class="section-title">🎴 甜蜜任务卡</h2>
@@ -1102,7 +1243,7 @@ body {
 </section>
 
 <!-- ============================================
-   Section 8: 结尾
+   Section 9: 结尾
    ============================================ -->
 <section class="section" id="section-ending" data-section="ending">
   <div class="ending-content">
@@ -1129,5 +1270,6 @@ body {
 <script src="themes/birthday.js"></script>
 <script src="js/app.js"></script>
 <script src="sections/task-cards.js"></script>
+<script src="sections/music-memories.js"></script>
 </body>
 </html>
