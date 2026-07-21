@@ -388,6 +388,10 @@ body {
 <div class="header">
   <h1>💕 一周年惊喜制作工具</h1>
   <div class="header-actions">
+    <select id="themeSelector" onchange="switchAdminTheme(this.value)" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.5);padding:6px 14px;border-radius:25px;font-size:12px;font-family:inherit;cursor:pointer;">
+      <option value="anniversary">💕 一周年主题</option>
+      <option value="birthday-vintage">🎂 生日·复古浪漫</option>
+    </select>
     <button class="btn btn-outline btn-sm" onclick="resetConfig()">🔄 恢复默认</button>
     <button class="btn btn-primary btn-sm" onclick="downloadConfig()">📥 下载配置</button>
     <button class="btn btn-primary btn-sm" onclick="downloadFullHTML()">📦 导出完整页面</button>
@@ -428,6 +432,7 @@ body {
 </div>
 
 <script src="config.js"></script>
+<script src="themes/birthday.js"></script>
 <script>
 // ============================================
 // Admin Tool Logic
@@ -490,7 +495,14 @@ function renderBasic() {
 }
 
 function renderTheme() {
-  const t = data.theme;
+  // If theme is a preset string name, fall back to default object for editing
+  const t = typeof data.theme === 'object' && data.theme !== null ? data.theme : {
+    primary: '#ff6b81', secondary: '#feca57', accent: '#ff9ff3',
+    bg: '#fdf6ee', dark: '#2d3436', light: '#ffffff',
+    gradient1: 'linear-gradient(135deg, #ff6b81 0%, #ff9ff3 50%, #feca57 100%)',
+    gradient2: 'linear-gradient(135deg, #ff9ff3 0%, #feca57 100%)',
+    gradient3: 'linear-gradient(135deg, #ff6b81 0%, #feca57 100%)',
+  };
   let html = '<h2>🎨 主题配色</h2><p class="sec-desc">自定义页面的主色调和渐变色</p>';
   const fields = [
     ['primary','主色调（爱心粉）'],['secondary','辅助色（温暖金）'],['accent','强调色（浪漫紫粉）'],
@@ -669,6 +681,16 @@ function syncFromForm(sectionId) {
       data.couple.description = val('cfg-desc');
       break;
     case 'sec-theme':
+      // Ensure data.theme is an object (it might be a string if preset theme was selected)
+      if (typeof data.theme !== 'object' || data.theme === null) {
+        data.theme = {
+          primary: '#ff6b81', secondary: '#feca57', accent: '#ff9ff3',
+          bg: '#fdf6ee', dark: '#2d3436', light: '#ffffff',
+          gradient1: 'linear-gradient(135deg, #ff6b81 0%, #ff9ff3 50%, #feca57 100%)',
+          gradient2: 'linear-gradient(135deg, #ff9ff3 0%, #feca57 100%)',
+          gradient3: 'linear-gradient(135deg, #ff6b81 0%, #feca57 100%)',
+        };
+      }
       data.theme.primary = val('cfg-theme-primary');
       data.theme.secondary = val('cfg-theme-secondary');
       data.theme.accent = val('cfg-theme-accent');
@@ -893,8 +915,48 @@ function applyAndPreview() {
   }
 }
 
+// ========== 主题切换 ==========
+function switchAdminTheme(themeName) {
+  // Update the theme in data
+  data.theme = themeName;
+
+  // If switching to a preset theme, try to load theme config
+  if (themeName === 'birthday-vintage') {
+    // Try fetching the birthday theme file
+    fetch('themes/birthday.js')
+      .then(r => r.text())
+      .then(js => {
+        eval(js);
+        if (typeof BIRTHDAY_THEME !== 'undefined') {
+          Object.entries(BIRTHDAY_THEME.css).forEach(([key, value]) => {
+            document.documentElement.style.setProperty(key, value);
+          });
+          showToast('🎨 已切换为生日·复古浪漫主题');
+        }
+      })
+      .catch(() => {
+        // Fallback: just apply colors from the theme file if already loaded
+        if (typeof BIRTHDAY_THEME !== 'undefined') {
+          Object.entries(BIRTHDAY_THEME.css).forEach(([key, value]) => {
+            document.documentElement.style.setProperty(key, value);
+          });
+        }
+      });
+  }
+
+  // Refresh the preview
+  const frame = document.getElementById('previewFrame');
+  if (frame) frame.src = frame.src;
+}
+
 // ========== 初始化 ==========
 renderSection('sec-basic');
+
+// Set theme selector to match current config
+const themeSel = document.getElementById('themeSelector');
+if (themeSel && typeof data.theme === 'string') {
+  themeSel.value = data.theme;
+}
 console.log('💕 一周年惊喜制作工具已就绪！');
 console.log('📝 在左侧编辑内容 → 点击"导出完整页面"获取成品');
 </script>
