@@ -1,8 +1,51 @@
 /**
  * ============================================
- *  💕 一周年纪念 — 主程序
+ *  💕 纪念日/生日 — 主程序
  * ============================================
  */
+
+// ========== 主题系统 ==========
+const ThemeManager = {
+  current: CONFIG.theme || 'anniversary',
+
+  apply(name) {
+    const root = document.documentElement;
+    let themeConfig;
+
+    if (name === 'birthday-vintage' && typeof BIRTHDAY_THEME !== 'undefined') {
+      themeConfig = BIRTHDAY_THEME;
+    } else {
+      // 默认使用内置 CSS 变量（从 CONFIG.theme 映射）
+      themeConfig = {
+        css: {
+          '--primary': CONFIG.theme.primary || '#ff6b81',
+          '--secondary': CONFIG.theme.secondary || '#feca57',
+          '--accent': CONFIG.theme.accent || '#ff9ff3',
+          '--bg': CONFIG.theme.bg || '#fff5f7',
+          '--dark': CONFIG.theme.dark || '#2d3436',
+          '--light': CONFIG.theme.light || '#ffffff',
+          '--gradient1': CONFIG.theme.gradient1 || 'linear-gradient(135deg, #ff6b81 0%, #ff9ff3 100%)',
+          '--gradient2': CONFIG.theme.gradient2 || 'linear-gradient(135deg, #feca57 0%, #ff9ff3 100%)',
+          '--gradient3': CONFIG.theme.gradient3 || 'linear-gradient(135deg, #a29bfe 0%, #ff9ff3 100%)',
+        }
+      };
+    }
+
+    Object.entries(themeConfig.css).forEach(([key, value]) => {
+      root.style.setProperty(key, value);
+    });
+
+    this.current = name;
+  },
+
+  getCurrent() {
+    return this.current;
+  }
+};
+
+// 初始化主题
+ThemeManager.apply(CONFIG.theme);
+
 (function () {
   'use strict';
 
@@ -12,22 +55,6 @@
 
   // 检测微信浏览器
   const isWeChat = /micromessenger/i.test(navigator.userAgent);
-
-  // ========== 全局主题应用 ==========
-  function applyTheme() {
-    const root = document.documentElement;
-    const t = CONFIG.theme;
-    root.style.setProperty('--primary', t.primary);
-    root.style.setProperty('--secondary', t.secondary);
-    root.style.setProperty('--accent', t.accent);
-    root.style.setProperty('--bg', t.bg);
-    root.style.setProperty('--dark', t.dark);
-    root.style.setProperty('--light', t.light);
-    root.style.setProperty('--gradient1', t.gradient1);
-    root.style.setProperty('--gradient2', t.gradient2);
-    root.style.setProperty('--gradient3', t.gradient3);
-  }
-  applyTheme();
 
   // ========== 粒子系统 ==========
   function initParticles() {
@@ -548,7 +575,7 @@
     wishes.forEach((wish, i) => {
       const bottle = document.createElement('div');
       bottle.className = 'wish-bottle';
-      bottle.style.background = wish.color || CONFIG.theme.primary;
+      bottle.style.background = wish.color || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#d4a574';
       bottle.textContent = bottleEmojis[i % bottleEmojis.length];
       bottle.style.animationDelay = `${i * 0.1}s`;
       bottle.addEventListener('click', () => openWish(wish));
