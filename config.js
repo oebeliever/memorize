@@ -172,7 +172,14 @@ const CONFIG = {
       isSpecial: true,
     },
   ],
-  starWishes: [],
+  starWishes: [
+    { id: 1, text: '愿你每天都开心快乐 ✨', from: '爱你的', emoji: '⭐', x: 0.2, y: 0.3, size: 'medium' },
+    { id: 2, text: '愿所有美好都如约而至 🌟', from: '你的专属', emoji: '🌟', x: 0.5, y: 0.2, size: 'large' },
+    { id: 3, text: '愿你的笑容永远灿烂 😊', from: '守护你的', emoji: '✨', x: 0.8, y: 0.4, size: 'small' },
+    { id: 4, text: '愿我们能一直走下去 💕', from: '想未来的', emoji: '⭐', x: 0.3, y: 0.6, size: 'medium' },
+    { id: 5, text: '愿你被世界温柔以待 🌸', from: '永远支持你的', emoji: '🌟', x: 0.7, y: 0.7, size: 'medium' },
+    { id: 6, text: '生日快乐，我最爱的人 🎂', from: '你的爱人', emoji: '💫', x: 0.5, y: 0.8, size: 'large', isConstellation: true },
+  ],
 
   // ========== 音乐配置 ==========
   music: {

@@ -950,6 +950,15 @@ body {
   50% { opacity: 1; transform: scale(1) rotate(180deg); }
 }
 
+/* ========== Star Wishes ========== */
+#starCanvas {
+  cursor: pointer;
+  touch-action: none;
+}
+.star-wish-text-show {
+  opacity: 1 !important;
+}
+
 /* ========== Music Memories ========== */
 .record-player {
   position: relative;
@@ -1333,7 +1342,25 @@ body {
 </section>
 
 <!-- ============================================
-   Section 10: 结尾
+   Section 10: 许愿星空
+   ============================================ -->
+<section class="section" id="section-star-wishes" data-section="starWishes" style="background:#0a0a1a;color:white;position:relative;overflow:hidden;min-height:100vh;">
+  <canvas id="starCanvas" style="position:absolute;inset:0;z-index:1;"></canvas>
+  <div style="position:relative;z-index:2;text-align:center;">
+    <h2 class="section-title" style="color:white;background:none;-webkit-text-fill-color:white;text-shadow:0 0 20px rgba(255,255,255,0.3);">🌟 许愿星空</h2>
+    <p class="section-subtitle" style="color:rgba(255,255,255,0.6);">划过星星，许下心愿 ✨</p>
+    <div id="starWishText" style="margin-top:20px;font-size:18px;min-height:80px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.5s ease;">
+      <div>
+        <div id="swText" style="font-size:18px;line-height:1.8;"></div>
+        <div id="swFrom" style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:8px;"></div>
+      </div>
+    </div>
+    <p style="margin-top:40px;font-size:13px;color:rgba(255,255,255,0.4);">✨ 用手划过星空，点击星星许愿 ✨</p>
+  </div>
+</section>
+
+<!-- ============================================
+   Section 11: 结尾
    ============================================ -->
 <section class="section" id="section-ending" data-section="ending">
   <div class="ending-content">
@@ -1362,5 +1389,6 @@ body {
 <script src="sections/task-cards.js"></script>
 <script src="sections/music-memories.js"></script>
 <script src="sections/time-capsule.js"></script>
+<script src="sections/star-wishes.js"></script>
 </body>
 </html>
