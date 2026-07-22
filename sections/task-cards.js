@@ -22,7 +22,7 @@
     let completedCount = 0;
     const CARDS_PER_PAGE = 5;
 
-    let currentPage = 0;
+    let currentPage = -1; // 初始为-1，首次switchPage才能执行
     const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
 
     function buildCard(card) {
@@ -71,8 +71,9 @@
       return div;
     }
 
-    function switchPage(newPage, direction) {
+    function switchPage(newPage, direction, skipAnim) {
       if (newPage === currentPage || newPage < 0 || newPage >= totalPages) return;
+      if (skipAnim) { currentPage = newPage; grid.innerHTML = ""; grid.className = "task-grid"; var st = newPage * CARDS_PER_PAGE; var en = Math.min(st + CARDS_PER_PAGE, cards.length); for (var si = st; si < en; si++) { grid.appendChild(buildCard(cards[si])); } updatePagination(); updateHint(); return; }
       // 滑出动画
       grid.classList.add(direction > 0 ? 'slide-left' : 'slide-right');
       setTimeout(() => {
@@ -136,7 +137,7 @@
       el.textContent = '👈 ' + (currentPage + 1) + '/' + totalPages + ' 👉';
     }
 
-    switchPage(0, 1);
+    switchPage(0, 1, true);
   }
 
   if (document.readyState === 'loading') {
