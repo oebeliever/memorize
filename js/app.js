@@ -75,6 +75,124 @@ const SectionManager = {
   }
 };
 
+// ========== 页面翻页控制器 ==========
+const PageController = {
+  current: 0,
+  sections: [],
+
+  init() {
+    // 只包含启用的板块
+    this.sections = Array.from(document.querySelectorAll('[data-section]'))
+      .filter(el => el.style.display !== 'none');
+
+    if (this.sections.length === 0) return;
+
+    // 生成导航点
+    this.renderDots();
+
+    // 点击空白区域翻页
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      // 不拦截交互元素
+      if (target.closest('button, a, input, textarea, select, .music-toggle, .task-card, .wish-bottle, .capsule-item, .quiz-option, .nav-dot, .nav-arrow, .wish-modal-overlay, .capsule-modal-overlay, .card-done-btn')) return;
+      if (target.tagName === 'CANVAS') return;
+      this.next();
+    });
+
+    // 触控滑动
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0) this.next();
+        else this.prev();
+      }
+    }, { passive: true });
+
+    // 键盘
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); this.next(); }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); this.prev(); }
+    });
+
+    // 滚轮翻页（防抖）
+    let wheelTimeout = null;
+    document.addEventListener('wheel', (e) => {
+      if (wheelTimeout) return;
+      wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
+      if (e.deltaY > 0) this.next();
+      else if (e.deltaY < 0) this.prev();
+    }, { passive: true });
+
+    // 监听滚动更新导航点
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = this.sections.indexOf(entry.target);
+          if (idx >= 0) this.current = idx;
+          this.updateDots();
+        }
+      });
+    }, { threshold: 0.5 });
+
+    this.sections.forEach(s => observer.observe(s));
+
+    this.updateDots();
+  },
+
+  goTo(index) {
+    if (index < 0 || index >= this.sections.length) return;
+    this.current = index;
+    this.sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.updateDots();
+
+    // 显示/隐藏底部箭头
+    const arrow = document.getElementById('navArrow');
+    if (arrow) {
+      arrow.style.display = index >= this.sections.length - 1 ? 'none' : 'flex';
+    }
+  },
+
+  next() {
+    if (this.current < this.sections.length - 1) {
+      this.goTo(this.current + 1);
+    }
+  },
+
+  prev() {
+    if (this.current > 0) {
+      this.goTo(this.current - 1);
+    }
+  },
+
+  renderDots() {
+    const container = document.getElementById('navDots');
+    if (!container) return;
+    container.innerHTML = '';
+    this.sections.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.goTo(i);
+      });
+      container.appendChild(dot);
+    });
+  },
+
+  updateDots() {
+    document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+      dot.classList.toggle('active', i === this.current);
+    });
+  }
+};
+
+// 暴露给全局（HTML 按钮可用）
+window.PageController = PageController;
+
 (function () {
   'use strict';
 
@@ -744,9 +862,13 @@ const SectionManager = {
   // ========== 板块启用控制 ==========
   SectionManager.init();
 
+  // ========== 翻页控制器 ==========
+  // 延迟初始化确保所有板块都已渲染
+  setTimeout(() => PageController.init(), 100);
+
   // ========== 启动完成 ==========
   console.log('🎨 惊喜页面已就绪！');
   console.log('💝 在一起的第 ' + Math.floor((new Date() - new Date(CONFIG.couple.anniversary)) / (1000 * 60 * 60 * 24)) + ' 天');
-  console.log('✨ 祝' + CONFIG.couple.name1 + '和' + CONFIG.couple.name2 + '一周年快乐！');
+  console.log('✨ 祝' + CONFIG.couple.name1 + '和' + CONFIG.couple.name2 + '永远幸福快乐！');
 
 })();
