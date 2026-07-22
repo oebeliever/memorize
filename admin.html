@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💕 一周年惊喜制作工具</title>
+<title>🎨 惊喜工坊 — 浪漫页面制作工具</title>
 <style>
 /* ============================================
    Admin Tool Styles
@@ -386,7 +386,7 @@ body {
 
 <!-- Header -->
 <div class="header">
-  <h1>💕 一周年惊喜制作工具</h1>
+  <h1>🎨 惊喜工坊</h1>
   <div class="header-actions">
     <select id="themeSelector" onchange="switchAdminTheme(this.value)" style="background:rgba(255,255,255,0.15);color:white;border:2px solid rgba(255,255,255,0.5);padding:6px 14px;border-radius:25px;font-size:12px;font-family:inherit;cursor:pointer;">
       <option value="anniversary">💕 一周年主题</option>
@@ -414,6 +414,10 @@ body {
       <li data-section="sec-quiz">                       <span class="emoji">🎯</span> 心有灵犀测验</li>
       <li data-section="sec-wishes">                     <span class="emoji">🏮</span> 心愿瓶留言</li>
       <li data-section="sec-ending">                     <span class="emoji">🎆</span> 结尾惊喜</li>
+      <li data-section="sec-taskcards">                 <span class="emoji">🎴</span> 甜蜜任务卡</li>
+      <li data-section="sec-musicmemories">             <span class="emoji">🎵</span> 音乐回忆簿</li>
+      <li data-section="sec-timecapsule">               <span class="emoji">📅</span> 时光胶囊</li>
+      <li data-section="sec-starwishes">                <span class="emoji">🌟</span> 许愿星空</li>
     </ul>
   </nav>
 
@@ -474,6 +478,10 @@ function getSectionHTML(id) {
     case 'sec-quiz': return renderQuiz();
     case 'sec-wishes': return renderWishes();
     case 'sec-ending': return renderEnding();
+    case 'sec-taskcards': return renderTaskCards();
+    case 'sec-musicmemories': return renderMusicMemories();
+    case 'sec-timecapsule': return renderTimeCapsule();
+    case 'sec-starwishes': return renderStarWishes();
     default: return '<p>请选择一个编辑板块</p>';
   }
 }
@@ -658,6 +666,136 @@ function renderEnding() {
   return html;
 }
 
+// ========== 新板块渲染：甜蜜任务卡 ==========
+function renderTaskCards() {
+  const items = data.taskCards || [];
+  let html = '<h2>🎴 甜蜜任务卡</h2><p class="sec-desc">翻转卡片显示甜蜜小任务，支持拖拽排序</p>';
+  if (items.length === 0) {
+    html += '<p style="color:#999;padding:12px;">还没有任务卡，点击下方添加~</p>';
+  }
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">🎴 第${i+1}张任务卡</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'taskCards\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'taskCards\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'taskCards\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>Emoji <span class="hint">（🤗 💬 🌟 🍰 等）</span></label><input type="text" id="cfg-tc-emoji-${i}" value="${esc(item.emoji)}"></div>
+        <div class="form-group"><label>标题</label><input type="text" id="cfg-tc-title-${i}" value="${esc(item.title)}"></div>
+        <div class="form-group"><label>任务描述</label><textarea id="cfg-tc-desc-${i}">${esc(item.desc)}</textarea></div>
+        <div class="form-group"><label>类型</label><select id="cfg-tc-type-${i}">
+          <option value="action" ${item.type==='action'?'selected':''}>动作任务 🤗</option>
+          <option value="sweet" ${item.type==='sweet'?'selected':''}>甜言蜜语 💬</option>
+          <option value="challenge" ${item.type==='challenge'?'selected':''}>小挑战 🎤</option>
+          <option value="special" ${item.type==='special'?'selected':''}>彩蛋卡 🎁</option>
+        </select></div>
+        <div class="form-group"><label>卡片颜色</label><input type="color" id="cfg-tc-color-${i}" value="${item.color}"></div>
+        <label style="font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="cfg-tc-special-${i}" ${item.isSpecial?'checked':''}> 设为彩蛋卡（翻开显示🎁）
+        </label>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'taskCards\')">+ 添加新任务卡</button>';
+  return html;
+}
+
+// ========== 新板块渲染：音乐回忆簿 ==========
+function renderMusicMemories() {
+  const items = data.musicMemories || [];
+  let html = '<h2>🎵 音乐回忆簿</h2><p class="sec-desc">每一首歌对应一段回忆，支持拖拽排序</p>';
+  if (items.length === 0) {
+    html += '<p style="color:#999;padding:12px;">还没有添加歌曲，点击下方添加~</p>';
+  }
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">🎵 第${i+1}首歌</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'musicMemories\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'musicMemories\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'musicMemories\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>歌曲名</label><input type="text" id="cfg-mm-title-${i}" value="${esc(item.title)}"></div>
+        <div class="form-group"><label>歌手</label><input type="text" id="cfg-mm-artist-${i}" value="${esc(item.artist)}"></div>
+        <div class="form-group"><label>音乐文件路径 <span class="hint">（assets/music/xxx.mp3 或在线链接）</span></label><input type="text" id="cfg-mm-src-${i}" value="${esc(item.src)}" placeholder="留空则仅视觉播放"></div>
+        <div class="form-group"><label>封面Emoji</label><input type="text" id="cfg-mm-emoji-${i}" value="${esc(item.coverEmoji || '🎵')}"></div>
+        <div class="form-group"><label>回忆文字</label><textarea id="cfg-mm-memory-${i}">${esc(item.memory||'')}</textarea></div>
+        <div class="form-group"><label>唱片标签颜色</label><input type="color" id="cfg-mm-color-${i}" value="${item.color}"></div>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'musicMemories\')">+ 添加新歌曲</button>';
+  return html;
+}
+
+// ========== 新板块渲染：时光胶囊 ==========
+function renderTimeCapsule() {
+  const items = data.timeCapsule || [];
+  let html = '<h2>📅 时光胶囊</h2><p class="sec-desc">按日期封印的情书，到指定日期才能解锁打开</p>';
+  if (items.length === 0) {
+    html += '<p style="color:#999;padding:12px;">还没有时光胶囊，点击下方添加~</p>';
+  }
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">📅 第${i+1}个胶囊</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'timeCapsule\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'timeCapsule\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'timeCapsule\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>解锁日期</label><input type="date" id="cfg-tc-date-${i}" value="${item.date}"></div>
+        <div class="form-group"><label>标题</label><input type="text" id="cfg-tc-title-${i}" value="${esc(item.title)}"></div>
+        <div class="form-group"><label>情书内容 <span class="hint">（写入你的心里话）</span></label><textarea id="cfg-tc-content-${i}" style="min-height:120px;">${esc(item.content)}</textarea></div>
+        <div class="form-group"><label>Emoji 图标</label><input type="text" id="cfg-tc-emoji-${i}" value="${esc(item.emoji||'💌')}"></div>
+        <label style="font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="cfg-tc-sp-${i}" ${item.isSpecial?'checked':''}> 设为特别内容（生日当天高亮显示）
+        </label>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'timeCapsule\')">+ 添加新胶囊</button>';
+  return html;
+}
+
+// ========== 新板块渲染：许愿星空 ==========
+function renderStarWishes() {
+  const items = data.starWishes || [];
+  let html = '<h2>🌟 许愿星空</h2><p class="sec-desc">夜空中的星星，每颗代表一个祝福。点击星星会坠落成流星✨</p>';
+  if (items.length === 0) {
+    html += '<p style="color:#999;padding:12px;">还没有许愿星，点击下方添加~</p>';
+  }
+  items.forEach((item,i) => {
+    html += `
+      <div class="array-item" data-index="${i}">
+        <div class="item-header"><span class="item-number">⭐ 第${i+1}颗星</span>
+          <div class="item-actions">
+            ${i>0 ? '<button onclick="moveArrayItem(\'starWishes\','+i+',-1)">▲</button>' : ''}
+            ${i<items.length-1 ? '<button onclick="moveArrayItem(\'starWishes\','+i+',1)">▼</button>' : ''}
+            <button class="danger" onclick="deleteArrayItem(\'starWishes\','+i+')">🗑</button>
+          </div>
+        </div>
+        <div class="form-group"><label>祝福文字</label><textarea id="cfg-sw-text-${i}">${esc(item.text)}</textarea></div>
+        <div class="form-group"><label>署名</label><input type="text" id="cfg-sw-from-${i}" value="${esc(item.from||'')}"></div>
+        <div class="form-group"><label>星星Emoji</label><input type="text" id="cfg-sw-emoji-${i}" value="${esc(item.emoji||'⭐')}"></div>
+        <div class="form-group"><label>星星大小</label><select id="cfg-sw-size-${i}">
+          <option value="small" ${item.size==='small'?'selected':''}>小 ⚬</option>
+          <option value="medium" ${item.size==='medium'?'selected':''}>中 ⭐</option>
+          <option value="large" ${item.size==='large'?'selected':''}>大 🌟</option>
+        </select></div>
+        <label style="font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="cfg-sw-cs-${i}" ${item.isConstellation?'checked':''}> 星座星（星星间会连线✨）
+        </label>
+        <p style="font-size:11px;color:#999;margin-top:4px;">💡 星星位置在页面生成时随机分布，以上内容就足够</p>
+      </div>`;
+  });
+  html += '<button class="add-btn" onclick="addArrayItem(\'starWishes\')">+ 添加新愿望</button>';
+  return html;
+}
+
 // ========== 事件绑定 ==========
 function bindSectionEvents(sectionId) {
   // 所有输入框修改时自动同步到 data
@@ -760,6 +898,44 @@ function syncFromForm(sectionId) {
       data.ending.date = val('cfg-end-date');
       data.ending.easterEgg = val('cfg-end-egg');
       break;
+    case 'sec-taskcards':
+      data.taskCards.forEach((item,i) => {
+        item.emoji = val(`cfg-tc-emoji-${i}`);
+        item.title = val(`cfg-tc-title-${i}`);
+        item.desc = val(`cfg-tc-desc-${i}`);
+        item.type = val(`cfg-tc-type-${i}`);
+        item.color = val(`cfg-tc-color-${i}`);
+        item.isSpecial = document.getElementById(`cfg-tc-special-${i}`)?.checked || false;
+      });
+      break;
+    case 'sec-musicmemories':
+      data.musicMemories.forEach((item,i) => {
+        item.title = val(`cfg-mm-title-${i}`);
+        item.artist = val(`cfg-mm-artist-${i}`);
+        item.src = val(`cfg-mm-src-${i}`);
+        item.coverEmoji = val(`cfg-mm-emoji-${i}`);
+        item.memory = val(`cfg-mm-memory-${i}`);
+        item.color = val(`cfg-mm-color-${i}`);
+      });
+      break;
+    case 'sec-timecapsule':
+      data.timeCapsule.forEach((item,i) => {
+        item.date = val(`cfg-tc-date-${i}`);
+        item.title = val(`cfg-tc-title-${i}`);
+        item.content = val(`cfg-tc-content-${i}`);
+        item.emoji = val(`cfg-tc-emoji-${i}`);
+        item.isSpecial = document.getElementById(`cfg-tc-sp-${i}`)?.checked || false;
+      });
+      break;
+    case 'sec-starwishes':
+      data.starWishes.forEach((item,i) => {
+        item.text = val(`cfg-sw-text-${i}`);
+        item.from = val(`cfg-sw-from-${i}`);
+        item.emoji = val(`cfg-sw-emoji-${i}`);
+        item.size = val(`cfg-sw-size-${i}`);
+        item.isConstellation = document.getElementById(`cfg-sw-cs-${i}`)?.checked || false;
+      });
+      break;
   }
 }
 
@@ -783,6 +959,18 @@ function addArrayItem(type) {
     case 'wishes':
       data.wishes.push({ id: data.wishes.length+1, text: '新的心愿留言...', from: '署名', color: '#ff6b81' });
       break;
+    case 'taskCards':
+      data.taskCards.push({ id: Date.now(), emoji: '🤗', title: '新任务', desc: '任务描述...', type: 'action', color: '#d4a574', isSpecial: false });
+      break;
+    case 'musicMemories':
+      data.musicMemories.push({ id: Date.now(), title: '新歌曲', artist: '歌手', src: '', coverEmoji: '🎵', memory: '回忆文字...', color: '#d4a574' });
+      break;
+    case 'timeCapsule':
+      data.timeCapsule.push({ id: Date.now(), date: '', title: '新胶囊', content: '写一封情书...', emoji: '💌', isSpecial: false });
+      break;
+    case 'starWishes':
+      data.starWishes.push({ id: Date.now(), text: '愿...', from: '署名', emoji: '⭐', x: Math.random(), y: Math.random(), size: 'medium', isConstellation: false });
+      break;
   }
   // 刷新当前section
   const activeTab = document.querySelector('.sidebar-nav li.active');
@@ -796,6 +984,10 @@ function deleteArrayItem(type, index) {
     case 'gallery': data.gallery.splice(index, 1); break;
     case 'quiz': data.quiz.questions.splice(index, 1); break;
     case 'wishes': data.wishes.splice(index, 1); break;
+    case 'taskCards': data.taskCards.splice(index, 1); break;
+    case 'musicMemories': data.musicMemories.splice(index, 1); break;
+    case 'timeCapsule': data.timeCapsule.splice(index, 1); break;
+    case 'starWishes': data.starWishes.splice(index, 1); break;
   }
   const activeTab = document.querySelector('.sidebar-nav li.active');
   if (activeTab) renderSection(activeTab.dataset.section);
@@ -808,6 +1000,10 @@ function moveArrayItem(type, index, direction) {
       case 'gallery': return data.gallery;
       case 'quiz': return data.quiz.questions;
       case 'wishes': return data.wishes;
+      case 'taskCards': return data.taskCards;
+      case 'musicMemories': return data.musicMemories;
+      case 'timeCapsule': return data.timeCapsule;
+      case 'starWishes': return data.starWishes;
     }
   })();
   const newIndex = index + direction;
@@ -883,7 +1079,30 @@ async function downloadFullHTML() {
       '<script>'+js+'</scr'+'ipt>'
     );
 
-    // 3. 删除 CSS 外部链接（如果有的话），CSS 已经在 style 标签中
+    // 3. 内联所有 sections/*.js 文件
+    const sectionFiles = ['task-cards.js','music-memories.js','time-capsule.js','star-wishes.js'];
+    for (const file of sectionFiles) {
+      try {
+        const secResp = await fetch('sections/' + file);
+        const secJs = await secResp.text();
+        const scriptTag = '<script src="sections/' + file + '"></scr' + 'ipt>';
+        html = html.replace(scriptTag, '<script>' + secJs + '</scr' + 'ipt>');
+      } catch(e) {
+        console.warn('⚠️ 未找到板块文件: sections/' + file);
+      }
+    }
+
+    // 4. 内联 themes/birthday.js
+    try {
+      const themeResp = await fetch('themes/birthday.js');
+      const themeJs = await themeResp.text();
+      html = html.replace(
+        /<script src="themes\/birthday\.js"><\/script>/,
+        '<script>'+themeJs+'</scr'+'ipt>'
+      );
+    } catch(e) {
+      console.warn('⚠️ 未找到主题文件: themes/birthday.js');
+    }
 
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -957,7 +1176,7 @@ const themeSel = document.getElementById('themeSelector');
 if (themeSel && typeof data.theme === 'string') {
   themeSel.value = data.theme;
 }
-console.log('💕 一周年惊喜制作工具已就绪！');
+console.log('🎨 惊喜工坊已就绪！');
 console.log('📝 在左侧编辑内容 → 点击"导出完整页面"获取成品');
 </script>
 </body>

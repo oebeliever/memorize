@@ -745,7 +745,7 @@ const SectionManager = {
   SectionManager.init();
 
   // ========== 启动完成 ==========
-  console.log('💕 一周年纪念页面已就绪！');
+  console.log('🎨 惊喜页面已就绪！');
   console.log('💝 在一起的第 ' + Math.floor((new Date() - new Date(CONFIG.couple.anniversary)) / (1000 * 60 * 60 * 24)) + ' 天');
   console.log('✨ 祝' + CONFIG.couple.name1 + '和' + CONFIG.couple.name2 + '一周年快乐！');
 
