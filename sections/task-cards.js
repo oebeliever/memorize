@@ -1,5 +1,5 @@
 /**
- * 🎴 甜蜜任务卡 — 只能翻3张
+ * 🎴 甜蜜任务卡 — 分2页，只能翻3张
  */
 (function() {
   'use strict';
@@ -20,27 +20,16 @@
     let flipCount = 0;
     const completedSet = new Set();
     let completedCount = 0;
+    const CARDS_PER_PAGE = 5;
 
-    // 更新剩余可翻数量
-    function updateRemainingHint() {
-      const remain = MAX_FLIP - flipCount;
-      let hint = document.getElementById('taskFlipHint');
-      if (!hint) {
-        hint = document.createElement('p');
-        hint.id = 'taskFlipHint';
-        hint.style.cssText = 'text-align:center;font-size:13px;color:var(--text-light);margin-top:12px;';
-        grid.after(hint);
-      }
-      if (remain > 0) {
-        hint.textContent = `✨ 还可以翻开 ${remain} 张任务卡`;
-      } else {
-        hint.textContent = '✅ 已选满3张，快去完成任务吧！';
-      }
-    }
+    let currentPage = 0;
+    const totalPages = Math.ceil(cards.length / CARDS_PER_PAGE);
 
-    cards.forEach((card) => {
+    function buildCard(card) {
       const div = document.createElement('div');
       div.className = 'task-card';
+      if (flipped.has(card.id) || completedSet.has(card.id)) div.classList.add('flipped');
+      if (completedSet.has(card.id)) div.classList.add('done');
 
       div.innerHTML = `
         <div class="task-card-face task-card-back">
@@ -55,28 +44,21 @@
         </div>
       `;
 
-      // 点击卡片翻转（限制3张）
       div.addEventListener('click', (e) => {
         if (e.target.closest('.card-done-btn')) return;
-        if (flipped.has(card.id)) return;
-        if (completedSet.has(card.id)) return;
+        if (flipped.has(card.id) || completedSet.has(card.id)) return;
         if (div.classList.contains('flipped')) return;
-        // 已翻满3张则阻止
         if (flipCount >= MAX_FLIP) return;
         flipped.add(card.id);
         flipCount++;
         div.classList.add('flipped');
         if (navigator.vibrate) navigator.vibrate(15);
-        updateRemainingHint();
+        updateHint();
       });
 
-      // 完成按钮
-      const doneBtn = div.querySelector('.card-done-btn');
-      doneBtn.addEventListener('click', (e) => {
+      div.querySelector('.card-done-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        if (completedSet.has(card.id)) return;
-        // 必须先翻开才能完成
-        if (!flipped.has(card.id)) return;
+        if (completedSet.has(card.id) || !flipped.has(card.id)) return;
         completedSet.add(card.id);
         div.classList.add('done');
         completedCount++;
@@ -86,10 +68,53 @@
         }
       });
 
-      grid.appendChild(div);
-    });
+      return div;
+    }
 
-    updateRemainingHint();
+    function renderPage(page) {
+      currentPage = page;
+      grid.innerHTML = '';
+      const start = page * CARDS_PER_PAGE;
+      const end = Math.min(start + CARDS_PER_PAGE, cards.length);
+      for (let i = start; i < end; i++) {
+        grid.appendChild(buildCard(cards[i]));
+      }
+      updatePagination();
+      updateHint();
+    }
+
+    function updateHint() {
+      const remain = MAX_FLIP - flipCount;
+      let el = document.getElementById('taskFlipHint');
+      if (!el) {
+        el = document.createElement('p');
+        el.id = 'taskFlipHint';
+        el.style.cssText = 'text-align:center;font-size:13px;color:var(--text-light);margin:12px 0 0;';
+        grid.after(el);
+      }
+      el.textContent = remain > 0 ? '✨ 还可以翻开 ' + remain + ' 张' : '✅ 已选满3张，快去完成任务吧！';
+    }
+
+    function updatePagination() {
+      if (totalPages <= 1) return;
+      let bar = document.getElementById('taskPageBar');
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'taskPageBar';
+        bar.className = 'pagination-bar';
+        bar.style.marginTop = '12px';
+        grid.after(bar);
+      }
+      bar.innerHTML = '';
+      for (let i = 0; i < totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'pagination-dot' + (i === currentPage ? ' active' : '');
+        dot.addEventListener('click', () => renderPage(i));
+        bar.appendChild(dot);
+      }
+    }
+
+    renderPage(0);
   }
 
   if (document.readyState === 'loading') {
