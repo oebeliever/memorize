@@ -136,7 +136,7 @@
       el.textContent = '👈 ' + (currentPage + 1) + '/' + totalPages + ' 👉';
     }
 
-    renderPage(0);
+    switchPage(0, 1);
   }
 
   if (document.readyState === 'loading') {

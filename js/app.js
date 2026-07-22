@@ -99,7 +99,11 @@ const PageController = {
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
       // 星空页需要触摸交互，禁用滑动翻页
-      if (e.target.closest('#section-star-wishes, #starCanvas')) return;
+      const starSec = document.getElementById('section-star-wishes');
+      if (starSec) {
+        const r = starSec.getBoundingClientRect();
+        if (r.top < 50 && r.bottom > window.innerHeight - 50) return;
+      }
       const diff = touchStartY - e.changedTouches[0].clientY;
       const elapsed = Date.now() - touchStartTime;
       if (Math.abs(diff) > 120 && elapsed > 150) {
@@ -342,6 +346,31 @@ window.PageController = PageController;
     }
 
     btn.textContent = CONFIG.music.title || '🎵';
+
+    // 尝试自动播放（微信需要用户手势触发）
+    function tryAutoPlay() {
+      if (!audio || playing) return;
+      audio.play().then(() => {
+        playing = true;
+        btn.classList.add('playing');
+        btn.textContent = '🎶';
+      }).catch(() => {});
+    }
+    // 如果配置了自动播放，在首次交互时触发
+    if (CONFIG.music.autoplay && CONFIG.music.src) {
+      // 微信：在 WeixinJSBridge 就绪时触发
+      if (typeof WeixinJSBridge !== 'undefined') {
+        WeixinJSBridge.invoke('getNetworkType', {}, tryAutoPlay);
+      }
+      // 标准浏览器：首次触摸/点击时触发
+      const firstTouch = () => {
+        tryAutoPlay();
+        document.removeEventListener('touchstart', firstTouch);
+        document.removeEventListener('click', firstTouch);
+      };
+      document.addEventListener('touchstart', firstTouch, { once: true });
+      document.addEventListener('click', firstTouch, { once: true });
+    }
 
     btn.addEventListener('click', () => {
       if (!audio) {
