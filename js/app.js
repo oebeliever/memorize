@@ -753,7 +753,7 @@ window.PageController = PageController;
   }
   initQuiz();
 
-  // ========== Section 6: 心愿瓶（分页）==========
+  // ========== Section 6: 心愿瓶 ==========
   function initWishes() {
     const sea = $('#wishesSea');
     const wishes = CONFIG.wishes;
@@ -785,19 +785,15 @@ window.PageController = PageController;
     }
 
     const bottleEmojis = ['💝', '💌', '💗', '💖', '🩷', '💕', '✨', '🌟'];
-    const BOTTLES_PER_PAGE = 4;
-
-    function renderOne(wish, i) {
+    wishes.forEach((wish, i) => {
       const bottle = document.createElement('div');
       bottle.className = 'wish-bottle';
       bottle.style.background = wish.color || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#ff6b81';
       bottle.textContent = bottleEmojis[i % bottleEmojis.length];
-      bottle.style.animationDelay = `${(i % BOTTLES_PER_PAGE) * 0.1}s`;
+      bottle.style.animationDelay = `${i * 0.1}s`;
       bottle.addEventListener('click', () => openWish(wish));
       sea.appendChild(bottle);
-    }
-
-    createPagination(sea, wishes, BOTTLES_PER_PAGE, renderOne);
+    });
   }
   initWishes();
 
