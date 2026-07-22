@@ -274,7 +274,7 @@ const CONFIG = {
   "music": {
     "src": "assets/music/海屿你.mp3",
     "title": "💗 ",
-    "autoplay": false
+    "autoplay": true
   },
   "countdown": {
     "targetDate": "2026-07-23",
@@ -467,7 +467,7 @@ const CONFIG = {
   "ending": {
     "title": "🎂 生日快乐！",
     "message": "愿你的每一天都像今天一样灿烂\n愿你的每一个笑容都发自内心\n这一年有你在我身边\n每一天都变成了最美好的礼物\n\n生日快乐，我最爱的人 ❤️",
-    "signatureLine": "— 永远爱你的 —",
+    "signatureLine": "— 永远爱你的小狗 —",
     "date": "2026.07.23",
     "easterEgg": "嘘~告诉你一个小秘密：遇见你是我这辈子最幸运的事。生日快乐，每一岁都珍贵，而你最珍贵 💕",
     "fireworkColors": [

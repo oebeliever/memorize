@@ -86,15 +86,29 @@
     function drawTrail() {
       for (let i = 0; i < trail.length; i++) {
         const t = trail[i];
-        const alpha = i / trail.length * 0.6;
+        const ratio = i / trail.length;
+        const alpha = ratio * 0.8;
+        const radius = 2 + ratio * 6;
         ctx.save();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.shadowColor = 'rgba(255,200,150,0.3)';
-        ctx.shadowBlur = 8;
+
+        // 外层光晕
+        ctx.globalAlpha = alpha * 0.3;
+        ctx.fillStyle = 'rgba(255,180,100,0.3)';
+        ctx.shadowColor = 'rgba(255,200,100,0.5)';
+        ctx.shadowBlur = 25;
         ctx.beginPath();
-        ctx.arc(t.x, t.y, 1 + (i / trail.length) * 2, 0, Math.PI * 2);
+        ctx.arc(t.x, t.y, radius * 2.5, 0, Math.PI * 2);
         ctx.fill();
+
+        // 内层亮核
+        ctx.globalAlpha = alpha;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = 'rgba(255,220,150,0.6)';
+        ctx.fillStyle = 'rgba(255,240,200,0.9)';
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, radius, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
       }
     }
@@ -157,7 +171,7 @@
 
       // 星轨
       trail.push({ x, y });
-      if (trail.length > 20) trail.shift();
+      if (trail.length > 30) trail.shift();
     }
 
     function handleClick(e) {

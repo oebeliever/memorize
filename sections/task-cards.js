@@ -95,23 +95,32 @@
       el.textContent = remain > 0 ? '✨ 还可以翻开 ' + remain + ' 张' : '✅ 已选满3张，快去完成任务吧！';
     }
 
+    // 左右滑动切换页面
+    let touchStartX = 0;
+    grid.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    grid.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentPage < totalPages - 1) renderPage(currentPage + 1);
+        else if (diff < 0 && currentPage > 0) renderPage(currentPage - 1);
+      }
+    }, { passive: true });
+
     function updatePagination() {
       if (totalPages <= 1) return;
-      let bar = document.getElementById('taskPageBar');
-      if (!bar) {
-        bar = document.createElement('div');
-        bar.id = 'taskPageBar';
-        bar.className = 'pagination-bar';
-        bar.style.marginTop = '12px';
-        grid.after(bar);
+      let el = document.getElementById('taskPageInfo');
+      if (!el) {
+        el = document.createElement('p');
+        el.id = 'taskPageInfo';
+        el.style.cssText = 'text-align:center;font-size:13px;color:var(--text-light);margin:12px 0 0;letter-spacing:2px;';
+        updateHint(); // hint already inserted after grid
+        const hint = document.getElementById('taskFlipHint');
+        if (hint) hint.after(el);
+        else grid.after(el);
       }
-      bar.innerHTML = '';
-      for (let i = 0; i < totalPages; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'pagination-dot' + (i === currentPage ? ' active' : '');
-        dot.addEventListener('click', () => renderPage(i));
-        bar.appendChild(dot);
-      }
+      el.textContent = '👈 ' + (currentPage + 1) + '/' + totalPages + ' 👉';
     }
 
     renderPage(0);

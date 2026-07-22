@@ -97,7 +97,7 @@ const PageController = {
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
       const diff = touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(diff) > 80) {  // 从40提高到80
+      if (Math.abs(diff) > 160) {  // 阈值提高到160，需要大幅滑动才翻页
         if (diff > 0) this.next();
         else this.prev();
       }

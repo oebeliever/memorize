@@ -1227,6 +1227,31 @@ body {
   text-align: center;
 }
 
+/* ========== Star Section Nav Buttons ========== */
+.star-nav-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: rgba(255,255,255,0.7);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  pointer-events: auto;
+}
+.star-nav-btn:active { transform: translateX(-50%) scale(0.9); background: rgba(255,255,255,0.25); }
+.star-nav-btn.top { top: 16px; }
+.star-nav-btn.bottom { bottom: 16px; }
+
 /* ========== Page Navigation ========== */
 .page-nav {
   position: fixed;
@@ -1475,6 +1500,8 @@ body {
    Section 10: 许愿星空
    ============================================ -->
 <section class="section" id="section-star-wishes" data-section="starWishes" style="background:#0a0a1a;color:white;position:relative;overflow:hidden;min-height:100vh;">
+  <!-- 手动翻页按钮 -->
+  <button class="star-nav-btn top" onclick="window.PageController && PageController.prev()">▲</button>
   <canvas id="starCanvas" style="position:absolute;inset:0;z-index:1;"></canvas>
   <div style="position:relative;z-index:2;text-align:center;">
     <h2 class="section-title" style="color:white;background:none;-webkit-text-fill-color:white;text-shadow:0 0 20px rgba(255,255,255,0.3);">🌟 许愿星空</h2>
@@ -1485,8 +1512,9 @@ body {
         <div id="swFrom" style="font-size:14px;color:rgba(255,255,255,0.6);margin-top:8px;"></div>
       </div>
     </div>
-    <p style="margin-top:40px;font-size:13px;color:rgba(255,255,255,0.4);">✨ 用手划过星空，点击星星许愿 ✨</p>
+    <p style="margin-top:40px;font-size:13px;color:rgba(255,255,255,0.4);">✨ 划过星空 → 点击星星许愿 ✨</p>
   </div>
+  <button class="star-nav-btn bottom" onclick="window.PageController && PageController.next()">▼</button>
 </section>
 
 <!-- ============================================
@@ -1495,7 +1523,7 @@ body {
 <section class="section" id="section-ending" data-section="ending">
   <div class="ending-content">
     <div class="ending-stars">✨💕✨</div>
-    <h2 class="ending-title" id="endingTitle">🎆 一周年快乐</h2>
+    <h2 class="ending-title" id="endingTitle">🎂 生日快乐！</h2>
     <div class="ending-message" id="endingMessage">
       从0到1，从1到∞<br>我们的故事才刚刚开始<br>谢谢你出现在我的生命里<br>让一切变得如此美好
     </div>
