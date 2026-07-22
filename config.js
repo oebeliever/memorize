@@ -134,14 +134,14 @@ const CONFIG = {
       "isSpecial": true
     }
   ],
-  "musicMemories": [
+    "musicMemories": [
     {
       "id": 1,
       "title": "海屿你",
       "artist": "马也",
       "src": "assets/music/海屿你.mp3",
       "coverEmoji": "🎵",
-      "memory": "你说，这首歌很像我们俩的感情，",
+      "memory": "你说，这首歌很像我们俩的感情，那我愿意永远陷在回忆的漩涡里，因为我走不出去",
       "trimStart": 64,
       "trimEnd": 296,
       "color": "#d4a574"
@@ -152,32 +152,32 @@ const CONFIG = {
       "artist": "门尼",
       "src": "assets/music/巴拉莱卡.mp3",
       "coverEmoji": "🎈",
-      "memory": "这首歌就像我们的故事，从相识到相爱，每一步都充满了甜蜜的惊喜。",
+      "memory": "这首歌映照了我们从相识到相爱，每一步都充满了甜蜜的惊喜，就像刚开始的懵懂无知，到渐渐品尝到其中的韵味。",
       "color": "#e8c4a0",
-      "trimStart": 0,
-      "trimEnd": 0
+      "trimStart": 9,
+      "trimEnd": 283
     },
     {
       "id": 3,
       "title": "无人之岛",
       "artist": "任然",
-      "src": "",
+      "src": "assets/music/无人之岛.mp3",
       "coverEmoji": "🌿",
-      "memory": "雨下整夜，我的爱溢出就像雨水。每次听到这首歌就想起那个下雨的夜晚。",
+      "memory": "那天你让我唱这首歌，我没有唱，因为它太悲伤，而我想带给你快乐",
       "color": "#a8d8a8",
       "trimStart": 0,
-      "trimEnd": 0
+      "trimEnd": 285
     },
     {
       "id": 4,
       "title": "跳楼机",
       "artist": "队长",
-      "src": "",
+      "src": "assets/music/跳楼机.mp3",
       "coverEmoji": "💑",
-      "memory": "我想就这样牵着你的手不放开。爱其实可以很简单，就像我们这样。",
+      "memory": "记得第一次去ktv就和你唱了这首歌，想念和你一起走夜路唱歌的时光",
       "color": "#ffb3ba",
-      "trimStart": 0,
-      "trimEnd": 0
+      "trimStart": 34,
+      "trimEnd": 202
     }
   ],
   "timeCapsule": [
@@ -466,7 +466,7 @@ const CONFIG = {
   ],
   "ending": {
     "title": "🎂 生日快乐！",
-    "message": "愿你的每一天都像今天一样灿烂\n愿你的每一个笑容都发自内心\n这一年有你在我身边\n每一天都变成了最美好的礼物\n\n生日快乐，我最爱的人 ❤️",
+    "message": "愿你的每一天都像晴天一样灿烂\n愿你的每一个笑容都发自内心\n这一年有你在我身边\n每一天都变成了最美好的礼物\n\n生日快乐，我最爱的人 ❤️",
     "signatureLine": "— 永远爱你的小狗 —",
     "date": "2026.07.23",
     "easterEgg": "嘘~告诉你一个小秘密：遇见你是我这辈子最幸运的事。生日快乐，每一岁都珍贵，而你最珍贵 💕",
