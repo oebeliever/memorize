@@ -288,6 +288,111 @@ body {
   flex: 1;
 }
 
+/* Audio Trim Slider */
+.trim-widget { margin-top: 8px; }
+.trim-editor {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 8px;
+}
+.trim-bar-wrap {
+  position: relative;
+  height: 40px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+}
+.trim-track-bg {
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.trim-range-highlight {
+  position: absolute;
+  top: 50%;
+  height: 6px;
+  background: var(--primary);
+  border-radius: 3px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+.trim-handle {
+  position: absolute;
+  top: 50%;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  z-index: 3;
+  transition: box-shadow 0.15s;
+}
+.trim-handle:active { cursor: grabbing; box-shadow: 0 2px 12px rgba(255,107,129,0.4); }
+.trim-handle.end { background: var(--accent); }
+.trim-handle .handle-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--text-light);
+  white-space: nowrap;
+  background: rgba(255,255,255,0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.trim-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-light);
+}
+.trim-time-row .trim-current-time { color: var(--text); font-weight: 600; }
+.trim-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.trim-actions .range-info {
+  font-size: 11px;
+  color: var(--text-light);
+  flex: 1;
+  text-align: right;
+}
+.trim-play-btn {
+  padding: 6px 18px;
+  border-radius: 20px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.trim-play-btn:active { transform: scale(0.95); }
+.trim-play-btn.playing { background: #ff4757; }
+.trim-loading {
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+  padding: 20px;
+}
+
 /* Phone Preview */
 .preview-panel {
   width: 380px;
@@ -728,15 +833,37 @@ function renderMusicMemories() {
         <div class="form-group"><label>音乐文件 <span class="hint">（mp3/flac/ogg）</span></label>
           <div style="display:flex;gap:8px;"><input type="text" id="cfg-mm-src-${i}" value="${esc(item.src)}" placeholder="assets/music/song.mp3" style="flex:1;"><button class="btn btn-sm" onclick="fileBrowse('cfg-mm-src-${i}','audio/*')" style="border-color:#ccc;color:var(--text);white-space:nowrap;background:white;">📁 浏览</button></div>
         </div>
-        <div class="form-group" style="margin-bottom:12px;">
-          <label>🎬 音乐裁剪 <span class="hint">（只播放精选片段）</span></label>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <div><span style="font-size:12px;color:#999;">起始</span><br><input type="text" id="cfg-mm-trimStart-${i}" value="${item.trimStart || 0}" placeholder="0:00" style="width:80px;"></div>
-            <span style="margin-top:16px;color:#ccc;">→</span>
-            <div><span style="font-size:12px;color:#999;">结束</span><br><input type="text" id="cfg-mm-trimEnd-${i}" value="${item.trimEnd || 0}" placeholder="0:00" style="width:80px;"></div>
-            <button class="btn btn-sm" onclick="previewTrim('cfg-mm-src-${i}','cfg-mm-trimStart-${i}','cfg-mm-trimEnd-${i}')" style="border-color:var(--primary);color:var(--primary);background:white;white-space:nowrap;margin-top:12px;">▶ 试听裁剪</button>
+        <div class="form-group trim-widget">
+          <label>🎬 音乐裁剪 <span class="hint">（拖动滑块选区间）</span></label>
+          <!-- 隐藏的时间输入，用于保存数据 -->
+          <input type="hidden" id="cfg-mm-trimStart-${i}" value="${item.trimStart || 0}">
+          <input type="hidden" id="cfg-mm-trimEnd-${i}" value="${item.trimEnd || 0}">
+          <button class="btn btn-sm" onclick="toggleTrimmer(${i})" style="border-color:var(--primary);color:var(--primary);background:white;">
+            ✂️ 打开裁剪器
+          </button>
+          <span id="trimStatus-${i}" style="font-size:11px;color:#999;margin-left:8px;">
+            ${(item.trimStart || item.trimEnd) ? '✅ 已裁剪' : '未裁剪（播放整首）'}
+          </span>
+          <div class="trim-editor" id="trimEditor-${i}" style="display:none;">
+            <div class="trim-bar-wrap" id="trimBarWrap-${i}">
+              <div class="trim-track-bg"></div>
+              <div class="trim-range-highlight" id="trimHighlight-${i}" style="left:0%;right:0%;"></div>
+              <div class="trim-handle" id="trimStartHandle-${i}" style="left:0%;">
+                <span class="handle-label" id="trimStartLabel-${i}">起始 0:00</span>
+              </div>
+              <div class="trim-handle end" id="trimEndHandle-${i}" style="left:100%;">
+                <span class="handle-label" id="trimEndLabel-${i}">结束 0:00</span>
+              </div>
+            </div>
+            <div class="trim-time-row">
+              <span><span class="trim-current-time" id="trimCurTime-${i}">0:00</span> / <span id="trimDur-${i}">加载中...</span></span>
+              <span>🎵 <span id="trimFileName-${i}">未加载</span></span>
+            </div>
+            <div class="trim-actions">
+              <button class="trim-play-btn" id="trimPlayBtn-${i}" onclick="trimPlay(${i})">▶ 播放区间</button>
+              <span class="range-info" id="trimRangeInfo-${i}">区间: 0:00 → 结尾</span>
+            </div>
           </div>
-          <p style="font-size:11px;color:#bbb;margin-top:4px;">💡 格式: 秒数(120) 或 分:秒(1:30)。留空=播放整首</p>
         </div>
         <div class="form-group"><label>封面Emoji</label><input type="text" id="cfg-mm-emoji-${i}" value="${esc(item.coverEmoji || '🎵')}"></div>
         <div class="form-group"><label>回忆文字</label><textarea id="cfg-mm-memory-${i}">${esc(item.memory||'')}</textarea></div>
@@ -932,8 +1059,8 @@ function syncFromForm(sectionId) {
         item.coverEmoji = val(`cfg-mm-emoji-${i}`);
         item.memory = val(`cfg-mm-memory-${i}`);
         item.color = val(`cfg-mm-color-${i}`);
-        item.trimStart = parseTimeToSec(val(`cfg-mm-trimStart-${i}`));
-        item.trimEnd = parseTimeToSec(val(`cfg-mm-trimEnd-${i}`));
+        item.trimStart = parseFloat(val(`cfg-mm-trimStart-${i}`)) || 0;
+        item.trimEnd = parseFloat(val(`cfg-mm-trimEnd-${i}`)) || 0;
       });
       break;
     case 'sec-timecapsule':
@@ -1036,37 +1163,187 @@ function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ========== 音乐裁剪试听 ==========
-let previewAudio = null;
-function previewTrim(srcId, startId, endId) {
-  const src = document.getElementById(srcId)?.value;
-  const start = parseTimeToSec(document.getElementById(startId)?.value);
-  const end = parseTimeToSec(document.getElementById(endId)?.value);
+// ========== 音乐裁剪器（滑块版）==========
+const trimPlayers = {}; // 每个裁剪器的音频实例
 
+/** 打开/关闭裁剪器 */
+function toggleTrimmer(index) {
+  const editor = document.getElementById('trimEditor-' + index);
+  if (!editor) return;
+  const isOpen = editor.style.display !== 'none';
+  editor.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) initTrimmer(index);
+}
+
+/** 初始化裁剪器：加载音频、绑定拖动 */
+function initTrimmer(index) {
+  const src = document.getElementById('cfg-mm-src-' + index)?.value;
   if (!src) { showToast('⚠️ 请先选择音乐文件'); return; }
-  if (previewAudio) { previewAudio.pause(); previewAudio = null; }
 
-  previewAudio = new Audio(src);
-  previewAudio.currentTime = start || 0;
-  previewAudio.play().then(() => {
-    showToast('🎵 正在试听裁剪片段 (' + (start||0) + 's → ' + (end||'结尾') + 's)');
-  }).catch(() => {
-    showToast('⚠️ 无法播放，检查文件路径是否正确');
+  const wrap = document.getElementById('trimBarWrap-' + index);
+  const startHandle = document.getElementById('trimStartHandle-' + index);
+  const endHandle = document.getElementById('trimEndHandle-' + index);
+  const highlight = document.getElementById('trimHighlight-' + index);
+  const startLabel = document.getElementById('trimStartLabel-' + index);
+  const endLabel = document.getElementById('trimEndLabel-' + index);
+  const curTimeEl = document.getElementById('trimCurTime-' + index);
+  const durEl = document.getElementById('trimDur-' + index);
+  const fileNameEl = document.getElementById('trimFileName-' + index);
+  const rangeInfo = document.getElementById('trimRangeInfo-' + index);
+  const hiddenStart = document.getElementById('cfg-mm-trimStart-' + index);
+  const hiddenEnd = document.getElementById('cfg-mm-trimEnd-' + index);
+
+  // 清理旧音频
+  if (trimPlayers[index]) { trimPlayers[index].pause(); trimPlayers[index] = null; }
+
+  fileNameEl.textContent = src.split('/').pop();
+
+  const audio = new Audio(src);
+  trimPlayers[index] = audio;
+  let duration = 0;
+  let startPercent = parseFloat(hiddenStart.value) || 0;
+  let endPercent = audio.duration || 100;
+
+  audio.addEventListener('loadedmetadata', () => {
+    duration = audio.duration;
+    durEl.textContent = fmtTime(duration);
+    // 恢复已保存的裁剪值
+    const savedStart = parseTimeToSec(hiddenStart.value);
+    const savedEnd = parseTimeToSec(hiddenEnd.value);
+    if (savedEnd > 0 && duration > 0) {
+      startPercent = (savedStart / duration) * 100;
+      endPercent = (savedEnd / duration) * 100;
+    } else {
+      startPercent = 0;
+      endPercent = 100;
+    }
+    updateSliderUI();
   });
 
-  // 监听播放位置，在结束位置停止
-  const onTime = () => {
-    if (end > 0 && previewAudio.currentTime >= end) {
-      previewAudio.pause();
-      previewAudio.currentTime = start || 0;
-      showToast('⏹ 试听结束（裁剪范围: ' + (start||0) + 's → ' + end + 's）');
+  // 播放时更新时间显示
+  audio.addEventListener('timeupdate', () => {
+    curTimeEl.textContent = fmtTime(audio.currentTime);
+    // 到达结束位置自动停止
+    if (endPercent < 100 && duration > 0) {
+      const endSec = (endPercent / 100) * duration;
+      if (audio.currentTime >= endSec) {
+        audio.pause();
+        document.getElementById('trimPlayBtn-' + index).textContent = '▶ 播放区间';
+        document.getElementById('trimPlayBtn-' + index).classList.remove('playing');
+      }
     }
-  };
-  previewAudio.addEventListener('timeupdate', onTime);
+  });
 
-  // 播放完毕自动清理
-  previewAudio.addEventListener('ended', () => {
-    previewAudio = null;
+  audio.addEventListener('ended', () => {
+    document.getElementById('trimPlayBtn-' + index).textContent = '▶ 播放区间';
+    document.getElementById('trimPlayBtn-' + index).classList.remove('playing');
+  });
+
+  function fmtTime(sec) {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function updateSliderUI() {
+    const pStart = Math.min(startPercent, endPercent - 1);
+    const pEnd = Math.max(endPercent, pStart + 1);
+    startPercent = pStart;
+    endPercent = pEnd;
+
+    startHandle.style.left = pStart + '%';
+    endHandle.style.left = pEnd + '%';
+    highlight.style.left = pStart + '%';
+    highlight.style.right = (100 - pEnd) + '%';
+
+    if (duration > 0) {
+      const sSec = (pStart / 100) * duration;
+      const eSec = (pEnd / 100) * duration;
+      startLabel.textContent = '起始 ' + fmtTime(sSec);
+      endLabel.textContent = '结束 ' + fmtTime(eSec);
+      rangeInfo.textContent = '区间: ' + fmtTime(sSec) + ' → ' + fmtTime(eSec);
+      // 保存到隐藏字段（秒数）
+      hiddenStart.value = Math.round(sSec);
+      hiddenEnd.value = Math.round(eSec);
+    }
+
+    document.getElementById('trimStatus-' + index).textContent =
+      (pStart > 0 || pEnd < 100) ? '✅ 已裁剪' : '未裁剪（播放整首）';
+    document.getElementById('trimStatus-' + index).style.color =
+      (pStart > 0 || pEnd < 100) ? 'var(--success)' : '#999';
+  }
+
+  // 拖动逻辑
+  function makeDrag(handle, onMove) {
+    let dragging = false;
+    function startDrag(e) {
+      dragging = true;
+      e.preventDefault();
+    }
+    function moveDrag(e) {
+      if (!dragging) return;
+      const rect = wrap.getBoundingClientRect();
+      const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+      const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
+      onMove(pct);
+      updateSliderUI();
+    }
+    function endDrag() { dragging = false; }
+
+    handle.addEventListener('mousedown', startDrag);
+    handle.addEventListener('touchstart', startDrag, { passive: true });
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('touchmove', moveDrag, { passive: true });
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+  }
+
+  makeDrag(startHandle, (pct) => { startPercent = Math.min(pct, endPercent - 1); });
+  makeDrag(endHandle, (pct) => { endPercent = Math.max(pct, startPercent + 1); });
+
+  // 点击轨道快速定位
+  wrap.addEventListener('click', (e) => {
+    if (e.target.closest('.trim-handle')) return;
+    const rect = wrap.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const pct = (x / rect.width) * 100;
+    // 靠近起始还是结束？
+    if (Math.abs(pct - startPercent) < Math.abs(pct - endPercent)) {
+      startPercent = Math.min(pct, endPercent - 1);
+    } else {
+      endPercent = Math.max(pct, startPercent + 1);
+    }
+    updateSliderUI();
+  });
+
+  updateSliderUI();
+}
+
+/** 播放/停止裁剪区间 */
+function trimPlay(index) {
+  const audio = trimPlayers[index];
+  const btn = document.getElementById('trimPlayBtn-' + index);
+  if (!audio) { showToast('⚠️ 音频尚未加载'); return; }
+
+  if (!audio.paused) {
+    audio.pause();
+    btn.textContent = '▶ 播放区间';
+    btn.classList.remove('playing');
+    return;
+  }
+
+  const hiddenStart = document.getElementById('cfg-mm-trimStart-' + index);
+  const hiddenEnd = document.getElementById('cfg-mm-trimEnd-' + index);
+  const startSec = parseFloat(hiddenStart.value) || 0;
+  const endSec = parseFloat(hiddenEnd.value) || 0;
+
+  audio.currentTime = startSec;
+  audio.play().then(() => {
+    btn.textContent = '⏹ 停止';
+    btn.classList.add('playing');
+  }).catch(() => {
+    showToast('⚠️ 无法播放，检查文件路径');
   });
 }
 
@@ -1218,12 +1495,56 @@ function resetConfig() {
   showToast('🔄 已恢复默认配置');
 }
 
-function applyAndPreview() {
+async function applyAndPreview() {
   const frame = document.getElementById('previewFrame');
-  if (frame) {
-    showToast('👁️ 请在右侧手机预览中查看效果（需要先保存配置）');
-    // 刷新预览
-    frame.src = frame.src;
+  if (!frame) return;
+  showToast('👁️ 正在生成预览...');
+
+  try {
+    let resp = await fetch('index.html');
+    let html = await resp.text();
+
+    // 内联 config + themes + app + sections
+    const configJS = 'const CONFIG = ' + JSON.stringify(data, null, 2) + ';';
+    html = html.replace(/<script src="config\.js"><\/script>/, '<script>' + configJS + '</scr' + 'ipt>');
+
+    // 内联 themes/birthday.js
+    try {
+      const themeResp = await fetch('themes/birthday.js');
+      const themeJs = await themeResp.text();
+      html = html.replace(/<script src="themes\/birthday\.js"><\/script>/, '<script>' + themeJs + '</scr' + 'ipt>');
+    } catch(e) {}
+
+    // 内联 app.js
+    const jsResp = await fetch('js/app.js');
+    const js = await jsResp.text();
+    html = html.replace(/<script src="js\/app\.js"><\/script>/, '<script>' + js + '</scr' + 'ipt>');
+
+    // 内联 sections
+    const secFiles = ['task-cards.js','music-memories.js','time-capsule.js','star-wishes.js'];
+    for (const file of secFiles) {
+      try {
+        const r = await fetch('sections/' + file);
+        const c = await r.text();
+        html = html.replace('<script src="sections/' + file + '"></scr' + 'ipt>', '<script>' + c + '</scr' + 'ipt>');
+      } catch(e) {}
+    }
+
+    // 应用当前主题
+    if (typeof BIRTHDAY_THEME !== 'undefined') {
+      const themeStyle = document.createElement('style');
+      let cssVars = ':root{';
+      Object.entries(BIRTHDAY_THEME.css).forEach(([k,v]) => { cssVars += k + ':' + v + ';'; });
+      cssVars += '}';
+      // 注入到 head
+      html = html.replace('</head>', '<style>' + cssVars + '</style></head>');
+    }
+
+    const blob = new Blob([html], { type: 'text/html' });
+    frame.src = URL.createObjectURL(blob);
+    showToast('✅ 预览已更新（含分页和当前配置）');
+  } catch(e) {
+    showToast('⚠️ 预览生成失败: ' + e.message);
   }
 }
 
