@@ -17,6 +17,9 @@
     let currentIndex = 0;
     let isPlaying = false;
     let audio = null;
+    let trimTimer = null;
+    let trimStart = 0;
+    let trimEnd = 0;
 
     const disc = document.getElementById('recordDisc');
     const arm = document.getElementById('recordArm');
@@ -43,12 +46,25 @@
       // 更新唱片颜色
       label.style.background = song.color || 'var(--primary)';
 
+      // 裁剪时间（秒）
+      trimStart = song.trimStart || 0;
+      trimEnd = song.trimEnd || 0;
+
+      // 清除之前的裁剪定时器
+      if (trimTimer) { clearTimeout(trimTimer); trimTimer = null; }
+
       // 如果有音乐源，创建 audio
       if (song.src) {
         audio = new Audio(song.src);
         audio.loop = false;
         audio.addEventListener('ended', () => {
           nextSong();
+        });
+        // 监听播放位置，到达 trimEnd 时自动切歌
+        audio.addEventListener('timeupdate', () => {
+          if (trimEnd > 0 && audio.currentTime >= trimEnd) {
+            nextSong();
+          }
         });
       } else {
         audio = null;
@@ -57,6 +73,10 @@
 
     function playSong() {
       if (audio) {
+        // 如果有裁剪起始时间，跳到指定位置
+        if (trimStart > 0) {
+          audio.currentTime = trimStart;
+        }
         audio.play().catch(() => {});
       }
       isPlaying = true;
@@ -66,6 +86,7 @@
     }
 
     function stopPlayback() {
+      if (trimTimer) { clearTimeout(trimTimer); trimTimer = null; }
       if (audio) {
         audio.pause();
         audio.currentTime = 0;

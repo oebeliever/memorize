@@ -530,7 +530,9 @@ function renderMusic() {
   return `
     <h2>🎵 背景音乐</h2>
     <p class="sec-desc">设置页面背景音乐（可选）</p>
-    <div class="form-group"><label>音乐文件URL <span class="hint">（mp3链接或本地路径如 assets/music/bg.mp3）</span></label><input type="text" id="cfg-music-src" value="${esc(m.src)}"></div>
+    <div class="form-group"><label>音乐文件 <span class="hint">（mp3/flac/ogg）</span></label>
+      <div style="display:flex;gap:8px;"><input type="text" id="cfg-music-src" value="${esc(m.src)}" placeholder="assets/music/bg.mp3" style="flex:1;"><button class="btn btn-sm" onclick="fileBrowse('cfg-music-src','audio/*')" style="border-color:#ccc;color:var(--text);white-space:nowrap;background:white;">📁 浏览</button></div>
+    </div>
     <div class="form-group"><label>音乐按钮文字</label><input type="text" id="cfg-music-title" value="${esc(m.title)}"></div>
     <div class="form-group"><label>自动播放</label><select id="cfg-music-autoplay"><option value="0" ${m.autoplay?'':'selected'}>否（推荐）</option><option value="1" ${m.autoplay?'selected':''}>是</option></select></div>
     <p style="color:#999;font-size:12px;">💡 微信浏览器通常禁止自动播放，建议保持"否"</p>
@@ -584,7 +586,9 @@ function renderGallery() {
             <button class="danger" onclick="deleteArrayItem(\'gallery\','+i+')">🗑</button>
           </div>
         </div>
-        <div class="form-group"><label>图片路径</label><input type="text" id="cfg-gal-src-${i}" value="${esc(item.src)}" placeholder="assets/photos/photo1.jpg 或 https://..."></div>
+        <div class="form-group"><label>图片路径</label>
+          <div style="display:flex;gap:8px;"><input type="text" id="cfg-gal-src-${i}" value="${esc(item.src)}" placeholder="assets/photos/photo1.jpg" style="flex:1;"><button class="btn btn-sm" onclick="fileBrowse('cfg-gal-src-${i}','image/*')" style="border-color:#ccc;color:var(--text);white-space:nowrap;background:white;">📁 浏览</button></div>
+        </div>
         <div class="form-group"><label>标题</label><input type="text" id="cfg-gal-cap-${i}" value="${esc(item.caption)}"></div>
         <div class="form-group"><label>描述</label><input type="text" id="cfg-gal-desc-${i}" value="${esc(item.desc)}"></div>
       </div>`;
@@ -721,7 +725,19 @@ function renderMusicMemories() {
         </div>
         <div class="form-group"><label>歌曲名</label><input type="text" id="cfg-mm-title-${i}" value="${esc(item.title)}"></div>
         <div class="form-group"><label>歌手</label><input type="text" id="cfg-mm-artist-${i}" value="${esc(item.artist)}"></div>
-        <div class="form-group"><label>音乐文件路径 <span class="hint">（assets/music/xxx.mp3 或在线链接）</span></label><input type="text" id="cfg-mm-src-${i}" value="${esc(item.src)}" placeholder="留空则仅视觉播放"></div>
+        <div class="form-group"><label>音乐文件 <span class="hint">（mp3/flac/ogg）</span></label>
+          <div style="display:flex;gap:8px;"><input type="text" id="cfg-mm-src-${i}" value="${esc(item.src)}" placeholder="assets/music/song.mp3" style="flex:1;"><button class="btn btn-sm" onclick="fileBrowse('cfg-mm-src-${i}','audio/*')" style="border-color:#ccc;color:var(--text);white-space:nowrap;background:white;">📁 浏览</button></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>🎬 音乐裁剪 <span class="hint">（只播放精选片段）</span></label>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div><span style="font-size:12px;color:#999;">起始</span><br><input type="text" id="cfg-mm-trimStart-${i}" value="${item.trimStart || 0}" placeholder="0:00" style="width:80px;"></div>
+            <span style="margin-top:16px;color:#ccc;">→</span>
+            <div><span style="font-size:12px;color:#999;">结束</span><br><input type="text" id="cfg-mm-trimEnd-${i}" value="${item.trimEnd || 0}" placeholder="0:00" style="width:80px;"></div>
+            <span style="font-size:11px;color:#999;margin-top:14px;">格式: 秒数 或 分:秒 (如 1:30)</span>
+          </div>
+          <p style="font-size:11px;color:#bbb;margin-top:4px;">💡 留空=播放整首。裁剪后的片段建议放入 <code>assets/music/trimmed/</code> 文件夹</p>
+        </div>
         <div class="form-group"><label>封面Emoji</label><input type="text" id="cfg-mm-emoji-${i}" value="${esc(item.coverEmoji || '🎵')}"></div>
         <div class="form-group"><label>回忆文字</label><textarea id="cfg-mm-memory-${i}">${esc(item.memory||'')}</textarea></div>
         <div class="form-group"><label>唱片标签颜色</label><input type="color" id="cfg-mm-color-${i}" value="${item.color}"></div>
@@ -916,6 +932,8 @@ function syncFromForm(sectionId) {
         item.coverEmoji = val(`cfg-mm-emoji-${i}`);
         item.memory = val(`cfg-mm-memory-${i}`);
         item.color = val(`cfg-mm-color-${i}`);
+        item.trimStart = parseTimeToSec(val(`cfg-mm-trimStart-${i}`));
+        item.trimEnd = parseTimeToSec(val(`cfg-mm-trimEnd-${i}`));
       });
       break;
     case 'sec-timecapsule':
@@ -963,7 +981,7 @@ function addArrayItem(type) {
       data.taskCards.push({ id: Date.now(), emoji: '🤗', title: '新任务', desc: '任务描述...', type: 'action', color: '#d4a574', isSpecial: false });
       break;
     case 'musicMemories':
-      data.musicMemories.push({ id: Date.now(), title: '新歌曲', artist: '歌手', src: '', coverEmoji: '🎵', memory: '回忆文字...', color: '#d4a574' });
+      data.musicMemories.push({ id: Date.now(), title: '新歌曲', artist: '歌手', src: '', coverEmoji: '🎵', memory: '回忆文字...', color: '#d4a574', trimStart: 0, trimEnd: 0 });
       break;
     case 'timeCapsule':
       data.timeCapsule.push({ id: Date.now(), date: '', title: '新胶囊', content: '写一封情书...', emoji: '💌', isSpecial: false });
@@ -1018,12 +1036,53 @@ function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/**
+ * 将 "分:秒" 或纯数字秒数转为秒数
+ * 例: "1:30" → 90, "120" → 120, "" → 0
+ */
+function parseTimeToSec(str) {
+  if (!str || str === '0') return 0;
+  str = String(str).trim();
+  if (str.includes(':')) {
+    const parts = str.split(':');
+    return parseInt(parts[0] || 0) * 60 + parseFloat(parts[1] || 0);
+  }
+  return parseFloat(str) || 0;
+}
+
 function showToast(msg) {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = msg;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 2500);
+}
+
+// ========== 文件选择器 ==========
+function fileBrowse(inputId, accept) {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = accept || '*/*';
+  input.style.display = 'none';
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    // 构建相对于 assets/ 的路径
+    let relPath = file.name;
+    // 根据文件类型建议存放位置
+    if (accept && accept.includes('image')) {
+      relPath = 'assets/photos/' + file.name;
+    } else if (accept && accept.includes('audio')) {
+      relPath = 'assets/music/' + file.name;
+    }
+    document.getElementById(inputId).value = relPath;
+    // 触发 input 事件同步数据
+    document.getElementById(inputId).dispatchEvent(new Event('input'));
+    showToast('✅ 已选择: ' + relPath + '（请将文件放入对应文件夹）');
+  });
+  document.body.appendChild(input);
+  input.click();
+  input.remove();
 }
 
 // ========== 导出功能 ==========

@@ -90,7 +90,9 @@ const CONFIG = {
       artist: '马也',
       src: '',
       coverEmoji: '🎵',
-      memory: '你说，这首歌很像我们俩的感情，虽然路途坎坷，但对彼此都情有独钟，我们的感情早已卷入漩涡，深陷在这一年中的点点滴滴中...',
+      memory: '你说，这首歌很像我们俩的感情',
+      trimStart: 0,
+      trimEnd: 0,
       color: '#d4a574',
     },
     {
