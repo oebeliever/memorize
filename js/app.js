@@ -203,9 +203,11 @@ window.PageController = PageController;
   // 检测微信浏览器
   const isWeChat = /micromessenger/i.test(navigator.userAgent);
 
-  // ========== 内部分页工具 ==========
+  // ========== 内部分页工具（每个实例独立ID）==========
+  let paginatorCounter = 0;
   function createPagination(container, items, itemsPerPage, renderItem) {
     let currentPage = 0;
+    const id = ++paginatorCounter;
     const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
     if (totalPages <= 1) {
       items.forEach((item, i) => renderItem(item, i));
@@ -215,17 +217,17 @@ window.PageController = PageController;
     const bar = document.createElement('div');
     bar.className = 'pagination-bar';
     bar.innerHTML = `
-      <button class="pagination-btn" id="pagePrev">‹ 上一页</button>
-      <div class="pagination-dots" id="pageDots"></div>
-      <span class="pagination-info" id="pageInfo">1/${totalPages}</span>
-      <button class="pagination-btn" id="pageNext">下一页 ›</button>
+      <button class="pagination-btn" data-page="prev-${id}">‹ 上一页</button>
+      <div class="pagination-dots" data-page="dots-${id}"></div>
+      <span class="pagination-info" data-page="info-${id}">1/${totalPages}</span>
+      <button class="pagination-btn" data-page="next-${id}">下一页 ›</button>
     `;
     container.after(bar);
 
-    const dotsContainer = bar.querySelector('#pageDots');
-    const infoEl = bar.querySelector('#pageInfo');
-    const prevBtn = bar.querySelector('#pagePrev');
-    const nextBtn = bar.querySelector('#pageNext');
+    const dotsContainer = bar.querySelector('[data-page="dots-' + id + '"]');
+    const infoEl = bar.querySelector('[data-page="info-' + id + '"]');
+    const prevBtn = bar.querySelector('[data-page="prev-' + id + '"]');
+    const nextBtn = bar.querySelector('[data-page="next-' + id + '"]');
 
     for (let i = 0; i < totalPages; i++) {
       const dot = document.createElement('div');

@@ -1299,8 +1299,28 @@ function initTrimmer(index) {
     document.addEventListener('touchend', endDrag);
   }
 
-  makeDrag(startHandle, (pct) => { startPercent = Math.min(pct, endPercent - 1); });
-  makeDrag(endHandle, (pct) => { endPercent = Math.max(pct, startPercent + 1); });
+  makeDrag(startHandle, (pct) => {
+    startPercent = Math.min(pct, endPercent - 1);
+    // 实时播放：拖动起始手柄时从对应位置播放
+    if (audio && duration > 0) {
+      const seekSec = (startPercent / 100) * duration;
+      if (Math.abs(audio.currentTime - seekSec) > 0.5 || audio.paused) {
+        audio.currentTime = seekSec;
+        if (audio.paused) audio.play().catch(() => {});
+      }
+    }
+  });
+  makeDrag(endHandle, (pct) => {
+    endPercent = Math.max(pct, startPercent + 1);
+    // 拖动结束手柄时跳到对应位置预览
+    if (audio && duration > 0) {
+      const seekSec = (endPercent / 100) * duration;
+      if (Math.abs(audio.currentTime - seekSec) > 0.5 || audio.paused) {
+        audio.currentTime = seekSec;
+        if (audio.paused) audio.play().catch(() => {});
+      }
+    }
+  });
 
   // 点击轨道快速定位
   wrap.addEventListener('click', (e) => {
