@@ -90,23 +90,14 @@ const PageController = {
     // 生成导航点
     this.renderDots();
 
-    // 点击空白区域翻页
-    document.addEventListener('click', (e) => {
-      const target = e.target;
-      // 不拦截交互元素
-      if (target.closest('button, a, input, textarea, select, .music-toggle, .task-card, .wish-bottle, .capsule-item, .quiz-option, .nav-dot, .nav-arrow, .wish-modal-overlay, .capsule-modal-overlay, .card-done-btn')) return;
-      if (target.tagName === 'CANVAS') return;
-      this.next();
-    });
-
-    // 触控滑动
+    // 触控滑动（提高阈值，防止误触）
     let touchStartY = 0;
     document.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
       const diff = touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(diff) > 40) {
+      if (Math.abs(diff) > 80) {  // 从40提高到80
         if (diff > 0) this.next();
         else this.prev();
       }
@@ -117,15 +108,6 @@ const PageController = {
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); this.next(); }
       if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); this.prev(); }
     });
-
-    // 滚轮翻页（防抖）
-    let wheelTimeout = null;
-    document.addEventListener('wheel', (e) => {
-      if (wheelTimeout) return;
-      wheelTimeout = setTimeout(() => { wheelTimeout = null; }, 800);
-      if (e.deltaY > 0) this.next();
-      else if (e.deltaY < 0) this.prev();
-    }, { passive: true });
 
     // 监听滚动更新导航点
     const observer = new IntersectionObserver((entries) => {
@@ -423,7 +405,9 @@ window.PageController = PageController;
       : countdown.targetDate;
 
     function updateCountdown() {
-      const target = new Date(countdownTarget);
+      // 解析日期，用本地时间0点（修复时区偏差）
+      const parts = countdownTarget.split('-').map(Number);
+      const target = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0);
       const now = new Date();
       let diff = target - now;
 
