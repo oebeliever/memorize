@@ -128,7 +128,7 @@ const PageController = {
   goTo(index) {
     if (index < 0 || index >= this.sections.length) return;
     this.current = index;
-    this.sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    this.sections[index].scrollIntoView({ behavior: 'instant', block: 'start' });
     this.updateDots();
 
     // 显示/隐藏底部箭头
