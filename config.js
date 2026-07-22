@@ -178,17 +178,6 @@ const CONFIG = {
       "color": "#ffb3ba",
       "trimStart": 0,
       "trimEnd": 0
-    },
-    {
-      "id": 5,
-      "title": "晴天",
-      "artist": "周杰伦",
-      "src": "",
-      "coverEmoji": "☀️",
-      "memory": "好不容易又能再多爱一天。和你在一起的每一天都是晴天。",
-      "color": "#ffd700",
-      "trimStart": 0,
-      "trimEnd": 0
     }
   ],
   "timeCapsule": [
@@ -346,7 +335,7 @@ const CONFIG = {
       "desc": "你的笑容是我每天的充电宝"
     },
     {
-      "src": "assets/photos/photo3.svg",
+      "src": "assets/photos/第三张.jpg",
       "caption": "一眼万年 🛤️",
       "desc": "回头眺望自己的童年，会不会遗憾呢"
     },
