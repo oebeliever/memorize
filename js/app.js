@@ -90,14 +90,18 @@ const PageController = {
     // 生成导航点
     this.renderDots();
 
-    // 触控滑动（提高阈值，防止误触）
+    // 触控滑动（延迟阈+大距离，过滤惯性滚动）
     let touchStartY = 0;
+    let touchStartTime = 0;
     document.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
+      touchStartTime = Date.now();
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
       const diff = touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(diff) > 160) {  // 阈值提高到160，需要大幅滑动才翻页
+      const elapsed = Date.now() - touchStartTime;
+      // 需要：滑够远 + 按住拖够久（过滤快速惯性滑动）
+      if (Math.abs(diff) > 200 && elapsed > 150) {
         if (diff > 0) this.next();
         else this.prev();
       }
@@ -128,7 +132,7 @@ const PageController = {
   goTo(index) {
     if (index < 0 || index >= this.sections.length) return;
     this.current = index;
-    this.sections[index].scrollIntoView({ behavior: 'instant', block: 'start' });
+    this.sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
     this.updateDots();
 
     // 显示/隐藏底部箭头
