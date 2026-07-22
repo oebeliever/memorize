@@ -71,16 +71,25 @@
       return div;
     }
 
-    function renderPage(page) {
-      currentPage = page;
-      grid.innerHTML = '';
-      const start = page * CARDS_PER_PAGE;
-      const end = Math.min(start + CARDS_PER_PAGE, cards.length);
-      for (let i = start; i < end; i++) {
-        grid.appendChild(buildCard(cards[i]));
-      }
-      updatePagination();
-      updateHint();
+    function switchPage(newPage, direction) {
+      if (newPage === currentPage || newPage < 0 || newPage >= totalPages) return;
+      // 滑出动画
+      grid.classList.add(direction > 0 ? 'slide-left' : 'slide-right');
+      setTimeout(() => {
+        currentPage = newPage;
+        grid.innerHTML = '';
+        grid.className = 'task-grid'; // 重置class
+        const start = newPage * CARDS_PER_PAGE;
+        const end = Math.min(start + CARDS_PER_PAGE, cards.length);
+        for (let i = start; i < end; i++) {
+          grid.appendChild(buildCard(cards[i]));
+        }
+        // 滑入动画
+        grid.classList.add(direction > 0 ? 'slide-in-right' : 'slide-in-left');
+        setTimeout(() => { grid.className = 'task-grid'; }, 250);
+        updatePagination();
+        updateHint();
+      }, 220);
     }
 
     function updateHint() {
@@ -95,16 +104,20 @@
       el.textContent = remain > 0 ? '✨ 还可以翻开 ' + remain + ' 张' : '✅ 已选满3张，快去完成任务吧！';
     }
 
-    // 左右滑动切换页面
+    // 左右滑动切换页面（带动画）
     let touchStartX = 0;
+    let isAnimating = false;
     grid.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;
     }, { passive: true });
     grid.addEventListener('touchend', (e) => {
+      if (isAnimating) return;
       const diff = touchStartX - e.changedTouches[0].clientX;
       if (Math.abs(diff) > 50) {
-        if (diff > 0 && currentPage < totalPages - 1) renderPage(currentPage + 1);
-        else if (diff < 0 && currentPage > 0) renderPage(currentPage - 1);
+        isAnimating = true;
+        if (diff > 0 && currentPage < totalPages - 1) switchPage(currentPage + 1, 1);
+        else if (diff < 0 && currentPage > 0) switchPage(currentPage - 1, -1);
+        setTimeout(() => { isAnimating = false; }, 500);
       }
     }, { passive: true });
 

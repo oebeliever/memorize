@@ -41,7 +41,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
 }
 
 body {
@@ -127,6 +127,7 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 .section-title {
   font-size: 28px;
@@ -951,6 +952,36 @@ body {
 @keyframes sparkle {
   0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
   50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* Task Cards Slide Animation */
+@keyframes slideOutLeft {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-30%); opacity: 0; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(30%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(30%); opacity: 0; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-30%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.task-grid.slide-left {
+  animation: slideOutLeft 0.25s ease forwards;
+}
+.task-grid.slide-in-right {
+  animation: slideInRight 0.25s ease forwards;
+}
+.task-grid.slide-right {
+  animation: slideOutRight 0.25s ease forwards;
+}
+.task-grid.slide-in-left {
+  animation: slideInLeft 0.25s ease forwards;
 }
 
 /* ========== Star Wishes ========== */

@@ -98,10 +98,11 @@ const PageController = {
       touchStartTime = Date.now();
     }, { passive: true });
     document.addEventListener('touchend', (e) => {
+      // 星空页需要触摸交互，禁用滑动翻页
+      if (e.target.closest('#section-star-wishes, #starCanvas')) return;
       const diff = touchStartY - e.changedTouches[0].clientY;
       const elapsed = Date.now() - touchStartTime;
-      // 需要：滑够远 + 按住拖够久（过滤快速惯性滑动）
-      if (Math.abs(diff) > 200 && elapsed > 150) {
+      if (Math.abs(diff) > 120 && elapsed > 150) {
         if (diff > 0) this.next();
         else this.prev();
       }
