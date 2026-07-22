@@ -730,13 +730,13 @@ function renderMusicMemories() {
         </div>
         <div class="form-group" style="margin-bottom:12px;">
           <label>🎬 音乐裁剪 <span class="hint">（只播放精选片段）</span></label>
-          <div style="display:flex;gap:10px;align-items:center;">
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <div><span style="font-size:12px;color:#999;">起始</span><br><input type="text" id="cfg-mm-trimStart-${i}" value="${item.trimStart || 0}" placeholder="0:00" style="width:80px;"></div>
             <span style="margin-top:16px;color:#ccc;">→</span>
             <div><span style="font-size:12px;color:#999;">结束</span><br><input type="text" id="cfg-mm-trimEnd-${i}" value="${item.trimEnd || 0}" placeholder="0:00" style="width:80px;"></div>
-            <span style="font-size:11px;color:#999;margin-top:14px;">格式: 秒数 或 分:秒 (如 1:30)</span>
+            <button class="btn btn-sm" onclick="previewTrim('cfg-mm-src-${i}','cfg-mm-trimStart-${i}','cfg-mm-trimEnd-${i}')" style="border-color:var(--primary);color:var(--primary);background:white;white-space:nowrap;margin-top:12px;">▶ 试听裁剪</button>
           </div>
-          <p style="font-size:11px;color:#bbb;margin-top:4px;">💡 留空=播放整首。裁剪后的片段建议放入 <code>assets/music/trimmed/</code> 文件夹</p>
+          <p style="font-size:11px;color:#bbb;margin-top:4px;">💡 格式: 秒数(120) 或 分:秒(1:30)。留空=播放整首</p>
         </div>
         <div class="form-group"><label>封面Emoji</label><input type="text" id="cfg-mm-emoji-${i}" value="${esc(item.coverEmoji || '🎵')}"></div>
         <div class="form-group"><label>回忆文字</label><textarea id="cfg-mm-memory-${i}">${esc(item.memory||'')}</textarea></div>
@@ -1034,6 +1034,40 @@ function moveArrayItem(type, index, direction) {
 // ========== 工具函数 ==========
 function esc(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ========== 音乐裁剪试听 ==========
+let previewAudio = null;
+function previewTrim(srcId, startId, endId) {
+  const src = document.getElementById(srcId)?.value;
+  const start = parseTimeToSec(document.getElementById(startId)?.value);
+  const end = parseTimeToSec(document.getElementById(endId)?.value);
+
+  if (!src) { showToast('⚠️ 请先选择音乐文件'); return; }
+  if (previewAudio) { previewAudio.pause(); previewAudio = null; }
+
+  previewAudio = new Audio(src);
+  previewAudio.currentTime = start || 0;
+  previewAudio.play().then(() => {
+    showToast('🎵 正在试听裁剪片段 (' + (start||0) + 's → ' + (end||'结尾') + 's)');
+  }).catch(() => {
+    showToast('⚠️ 无法播放，检查文件路径是否正确');
+  });
+
+  // 监听播放位置，在结束位置停止
+  const onTime = () => {
+    if (end > 0 && previewAudio.currentTime >= end) {
+      previewAudio.pause();
+      previewAudio.currentTime = start || 0;
+      showToast('⏹ 试听结束（裁剪范围: ' + (start||0) + 's → ' + end + 's）');
+    }
+  };
+  previewAudio.addEventListener('timeupdate', onTime);
+
+  // 播放完毕自动清理
+  previewAudio.addEventListener('ended', () => {
+    previewAudio = null;
+  });
 }
 
 /**

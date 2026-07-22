@@ -203,6 +203,64 @@ window.PageController = PageController;
   // 检测微信浏览器
   const isWeChat = /micromessenger/i.test(navigator.userAgent);
 
+  // ========== 内部分页工具 ==========
+  function createPagination(container, items, itemsPerPage, renderItem) {
+    let currentPage = 0;
+    const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
+    if (totalPages <= 1) {
+      items.forEach((item, i) => renderItem(item, i));
+      return { next() {}, prev() {}, goTo() {}, currentPage: () => 0, totalPages: () => 1 };
+    }
+
+    const bar = document.createElement('div');
+    bar.className = 'pagination-bar';
+    bar.innerHTML = `
+      <button class="pagination-btn" id="pagePrev">‹ 上一页</button>
+      <div class="pagination-dots" id="pageDots"></div>
+      <span class="pagination-info" id="pageInfo">1/${totalPages}</span>
+      <button class="pagination-btn" id="pageNext">下一页 ›</button>
+    `;
+    container.after(bar);
+
+    const dotsContainer = bar.querySelector('#pageDots');
+    const infoEl = bar.querySelector('#pageInfo');
+    const prevBtn = bar.querySelector('#pagePrev');
+    const nextBtn = bar.querySelector('#pageNext');
+
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'pagination-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    function renderPage(page) {
+      currentPage = page;
+      container.innerHTML = '';
+      const start = page * itemsPerPage;
+      const end = Math.min(start + itemsPerPage, items.length);
+      for (let i = start; i < end; i++) {
+        renderItem(items[i], i);
+      }
+      dotsContainer.querySelectorAll('.pagination-dot').forEach((d, j) => {
+        d.classList.toggle('active', j === page);
+      });
+      infoEl.textContent = (page + 1) + '/' + totalPages;
+      prevBtn.disabled = page <= 0;
+      nextBtn.disabled = page >= totalPages - 1;
+    }
+
+    function goTo(p) { if (p >= 0 && p < totalPages) renderPage(p); }
+    function next() { goTo(currentPage + 1); }
+    function prev() { goTo(currentPage - 1); }
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+
+    renderPage(0);
+    return { next, prev, goTo, currentPage: () => currentPage, totalPages: () => totalPages };
+  }
+
   // ========== 粒子系统 ==========
   function initParticles() {
     const canvas = $('#particles-canvas');
@@ -413,15 +471,16 @@ window.PageController = PageController;
 
   initOpening();
 
-  // ========== Section 2: 时间线 ==========
+  // ========== Section 2: 时间线（分页）==========
   function initTimeline() {
     const wrapper = $('#timelineWrapper');
     const timeline = CONFIG.timeline;
 
-    timeline.forEach((item, i) => {
+    const ITEMS_PER_PAGE = 3;
+
+    function renderOne(item, i) {
       const div = document.createElement('div');
-      div.className = 'timeline-item';
-      div.style.transitionDelay = `${i * 0.1}s`;
+      div.className = 'timeline-item visible'; // 直接可见（分页不需要滚动动画）
       div.innerHTML = `
         <div class="timeline-dot">${item.emoji || '💕'}</div>
         <div class="timeline-card">
@@ -431,21 +490,9 @@ window.PageController = PageController;
         </div>
       `;
       wrapper.appendChild(div);
-    });
+    }
 
-    // 滚动触发显示
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.2, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    $$('.timeline-item').forEach(item => observer.observe(item));
+    createPagination(wrapper, timeline, ITEMS_PER_PAGE, renderOne);
   }
   initTimeline();
 
@@ -704,7 +751,7 @@ window.PageController = PageController;
   }
   initQuiz();
 
-  // ========== Section 6: 心愿瓶 ==========
+  // ========== Section 6: 心愿瓶（分页）==========
   function initWishes() {
     const sea = $('#wishesSea');
     const wishes = CONFIG.wishes;
@@ -724,7 +771,6 @@ window.PageController = PageController;
           </div>
         </div>
       `;
-
       $('#wishOverlay').addEventListener('click', (e) => {
         if (e.target.id === 'wishOverlay') closeWish();
       });
@@ -736,17 +782,20 @@ window.PageController = PageController;
       modalEl.innerHTML = '';
     }
 
-    // 渲染瓶子
     const bottleEmojis = ['💝', '💌', '💗', '💖', '🩷', '💕', '✨', '🌟'];
-    wishes.forEach((wish, i) => {
+    const BOTTLES_PER_PAGE = 4;
+
+    function renderOne(wish, i) {
       const bottle = document.createElement('div');
       bottle.className = 'wish-bottle';
       bottle.style.background = wish.color || getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#ff6b81';
       bottle.textContent = bottleEmojis[i % bottleEmojis.length];
-      bottle.style.animationDelay = `${i * 0.1}s`;
+      bottle.style.animationDelay = `${(i % BOTTLES_PER_PAGE) * 0.1}s`;
       bottle.addEventListener('click', () => openWish(wish));
       sea.appendChild(bottle);
-    });
+    }
+
+    createPagination(sea, wishes, BOTTLES_PER_PAGE, renderOne);
   }
   initWishes();
 
